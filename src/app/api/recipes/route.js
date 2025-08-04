@@ -1,6 +1,6 @@
 // API route for recipes
 import { NextResponse } from 'next/server';
-import { searchRecipes, findRecipeById, fetchRecipeById } from '@/lib/recipeFetcher.server';
+import { searchRecipes, findRecipeById } from '@/lib/recipeDb.server';
 
 export async function GET(request) {
 	try {
@@ -16,7 +16,7 @@ export async function GET(request) {
 		// If ID is provided, fetch a single recipe
 		if (id) {
 			// Try DB first, then Edamam API with caching
-			const recipe = await fetchRecipeById(id);
+			const recipe = await findRecipeById(id);
 			if (!recipe) {
 				return NextResponse.json({ error: 'Recipe not found' }, { status: 404 });
 			}

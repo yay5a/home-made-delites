@@ -1,12 +1,130 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRecipes } from '@/hooks/useRecipes';
 import RecipeCard from '@/components/recipe/RecipeCard';
 import RecipeAssistant from '@/components/assistant/RecipeAssistant';
+import ApiStatusPage from '@/components/common/ApiStatusPage';
 
 export default function Home() {
-	const { recipes, loading } = useRecipes();
+	const { recipes, loading, shouldShowApiStatus, retryApiConnection } = useRecipes();
+	const [featuredRecipes, setFeaturedRecipes] = useState([]);
+	const [featuredLoading, setFeaturedLoading] = useState(true);
+
+	// Get random featured recipes from both database and Edamam API
+	useEffect(() => {
+		const fetchFeaturedRecipes = async () => {
+			try {
+				setFeaturedLoading(true);
+
+				// Try to get some recipes from our database first
+				let dbRecipes = [];
+				if (recipes && recipes.length > 0) {
+					// Shuffle and take up to 2 recipes from database
+					const shuffledDb = [...recipes].sort(() => 0.5 - Math.random());
+					dbRecipes = shuffledDb.slice(0, 2);
+				}
+
+				// Fetch some popular recipes from Edamam API to complement
+				try {
+					const { fetchEdamamRecipes } = await import('@/utils/edamamUtils');
+					const popularQueries = [
+						'popular chicken recipes',
+						'quick pasta',
+						'healthy salad',
+						'easy dessert',
+						'comfort food',
+					];
+
+					// Pick a random query for variety
+					const randomQuery =
+						popularQueries[Math.floor(Math.random() * popularQueries.length)];
+					const edamamData = await fetchEdamamRecipes(randomQuery, { limit: 6 });
+
+					if (edamamData && edamamData.hits) {
+						const { transformEdamamRecipe } = await import('@/utils/edamamUtils');
+						const edamamRecipes = edamamData.hits
+							.map((hit) => transformEdamamRecipe(hit))
+							.filter((recipe) => recipe && recipe.title);
+
+						// Combine database recipes with API recipes
+						const combined = [...dbRecipes, ...edamamRecipes];
+
+						// Shuffle and take 6 for featured section
+						const shuffled = combined.sort(() => 0.5 - Math.random());
+						setFeaturedRecipes(shuffled.slice(0, 6));
+					} else {
+						// Fallback to database recipes only
+						setFeaturedRecipes(dbRecipes.slice(0, 6));
+					}
+				} catch (apiError) {
+					console.warn(
+						'Failed to fetch from Edamam API, using database recipes only:',
+						apiError
+					);
+					// Fallback to database recipes only
+					setFeaturedRecipes(dbRecipes.slice(0, 6));
+				}
+			} catch (error) {
+				console.error('Error fetching featured recipes:', error);
+				// Ultimate fallback to first few recipes
+				setFeaturedRecipes(recipes?.slice(0, 6) || []);
+			} finally {
+				setFeaturedLoading(false);
+			}
+		};
+
+		// Only fetch featured recipes when we have loaded the initial recipes
+		if (!loading && !shouldShowApiStatus) {
+			fetchFeaturedRecipes();
+		}
+	}, [recipes, loading, shouldShowApiStatus]);
+
+	// If API has failed and we have no data, show the API status page
+	if (shouldShowApiStatus) {
+		return (
+			<ApiStatusPage
+				title='Recipe Service Unavailable'
+				message="We're unable to load recipes right now. This could be due to API rate limits or service issues."
+				showUsageDetails={true}
+			/>
+		);
+	}
+
+	// Function to refresh featured recipes
+	const refreshFeaturedRecipes = async () => {
+		setFeaturedLoading(true);
+
+		try {
+			const { fetchEdamamRecipes } = await import('@/utils/edamamUtils');
+			const popularQueries = [
+				'italian cuisine',
+				'mexican food',
+				'asian recipes',
+				'vegetarian meals',
+				'quick dinner',
+				'breakfast ideas',
+				'healthy lunch',
+			];
+
+			const randomQuery = popularQueries[Math.floor(Math.random() * popularQueries.length)];
+			const edamamData = await fetchEdamamRecipes(randomQuery, { limit: 6 });
+
+			if (edamamData && edamamData.hits) {
+				const { transformEdamamRecipe } = await import('@/utils/edamamUtils');
+				const edamamRecipes = edamamData.hits
+					.map((hit) => transformEdamamRecipe(hit))
+					.filter((recipe) => recipe && recipe.title);
+
+				setFeaturedRecipes(edamamRecipes.slice(0, 6));
+			}
+		} catch (error) {
+			console.error('Error refreshing featured recipes:', error);
+		} finally {
+			setFeaturedLoading(false);
+		}
+	};
 
 	return (
 		<div className='bg-gray-50'>
@@ -43,14 +161,33 @@ export default function Home() {
 				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
 					<div className='text-center mb-12'>
 						<h2 className='text-3xl font-bold text-gray-900 mb-4'>Featured Recipes</h2>
-						<p className='text-lg text-gray-600'>
-							Check out some of our most popular and loved recipes
+						<p className='text-lg text-gray-600 mb-4'>
+							Discover a delicious mix of popular recipes from our community and around the
+							world
 						</p>
+						<button
+							onClick={refreshFeaturedRecipes}
+							disabled={featuredLoading}
+							className='inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed'>
+							<svg
+								className='w-4 h-4'
+								fill='none'
+								stroke='currentColor'
+								viewBox='0 0 24 24'>
+								<path
+									strokeLinecap='round'
+									strokeLinejoin='round'
+									strokeWidth={2}
+									d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'
+								/>
+							</svg>
+							{featuredLoading ? 'Finding new recipes...' : 'Discover new recipes'}
+						</button>
 					</div>
 
-					{loading ? (
+					{featuredLoading ? (
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-							{[1, 2, 3].map((i) => (
+							{[1, 2, 3, 4, 5, 6].map((i) => (
 								<div
 									key={i}
 									className='bg-white rounded-lg shadow-md overflow-hidden animate-pulse'>
@@ -63,11 +200,22 @@ export default function Home() {
 								</div>
 							))}
 						</div>
-					) : (
+					) : featuredRecipes.length > 0 ? (
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-							{recipes.slice(0, 3).map((recipe) => (
-								<RecipeCard key={recipe.id} recipe={recipe} />
+							{featuredRecipes.map((recipe, index) => (
+								<RecipeCard key={recipe.id || recipe.uri || index} recipe={recipe} />
 							))}
+						</div>
+					) : (
+						<div className='text-center py-12'>
+							<p className='text-gray-500 mb-4'>
+								No featured recipes available at the moment.
+							</p>
+							<Link
+								href='/recipes'
+								className='text-blue-600 hover:text-blue-800 font-semibold'>
+								Browse all recipes →
+							</Link>
 						</div>
 					)}
 

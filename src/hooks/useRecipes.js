@@ -5,56 +5,14 @@ import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_RECIPES, SEARCH_RECIPES, GET_RECIPE_BY_ID } from '@/graphql/queries';
 import { fetchEdamamRecipes, fetchRecipeById, transformEdamamRecipe } from '@/utils/edamamUtils';
 
-// Fallback recipes in case API fails
-const fallbackRecipes = [
-	{
-		id: 'fallback-1',
-		title: 'Classic Chocolate Chip Cookies',
-		description: 'Soft and chewy chocolate chip cookies that are perfect for any occasion.',
-		image: '/images/chocolate-chip-cookies.jpg',
-		prepTime: 15,
-		cookTime: 12,
-		servings: 24,
-		category: 'dessert',
-		difficulty: 'easy',
-		ingredients: [
-			'2 1/4 cups all-purpose flour',
-			'1 tsp baking soda',
-			'1 tsp salt',
-			'1 cup butter, softened',
-			'3/4 cup granulated sugar',
-			'3/4 cup packed brown sugar',
-			'2 large eggs',
-			'2 tsp vanilla extract',
-			'2 cups chocolate chips',
-		],
-		instructions: [
-			'Preheat oven to 375°F (190°C).',
-			'Mix flour, baking soda, and salt in a bowl.',
-			'In another bowl, beat butter and sugars until creamy.',
-			'Beat in eggs and vanilla.',
-			'Gradually blend in flour mixture.',
-			'Stir in chocolate chips.',
-			'Drop rounded tablespoons onto ungreased cookie sheets.',
-			'Bake 9 to 11 minutes or until golden brown.',
-			'Cool on baking sheets 2 minutes; remove to wire rack.',
-		],
-		author: {
-			id: 'fallback-author',
-			name: 'Recipe Master',
-			email: 'recipes@homemadedelites.com',
-		},
-		createdAt: new Date().toISOString(),
-		updatedAt: new Date().toISOString(),
-	},
-];
-
 export function useRecipes(options = {}) {
 	const { limit = 10, offset = 0, category } = options;
 	const [searchQuery, setSearchQuery] = useState('');
 	const [edamamRecipes, setEdamamRecipes] = useState([]);
 	const [edamamLoading, setEdamamLoading] = useState(false);
 	const [nextPageUrl, setNextPageUrl] = useState(null);
+	const [apiError, setApiError] = useState(null);
+	const [hasApiFailure, setHasApiFailure] = useState(false);
 
 	// GraphQL query for database recipes
 	const {
@@ -67,6 +25,8 @@ export function useRecipes(options = {}) {
 		errorPolicy: 'all',
 		onError: (error) => {
 			console.error('GraphQL Error fetching recipes:', error);
+			setApiError(error);
+			setHasApiFailure(true);
 		},
 	});
 
@@ -77,6 +37,8 @@ export function useRecipes(options = {}) {
 			errorPolicy: 'all',
 			onError: (error) => {
 				console.error('GraphQL Error searching recipes:', error);
+				setApiError(error);
+				setHasApiFailure(true);
 			},
 		}
 	);
@@ -86,45 +48,45 @@ export function useRecipes(options = {}) {
 		errorPolicy: 'all',
 		onError: (error) => {
 			console.error('GraphQL Error fetching recipe by ID:', error);
+			setApiError(error);
 		},
 	});
 
 	// Fetch from Edamam API (external recipes)
-	const fetchEdamamRecipesData = useCallback(
-		async (query = 'popular recipes', url = null) => {
-			try {
-				setEdamamLoading(true);
-				let data;
+	const fetchEdamamRecipesData = useCallback(async (query = 'popular recipes', url = null) => {
+		try {
+			setEdamamLoading(true);
+			setApiError(null); // Clear previous errors
+			let data;
 
-				if (url) {
-					const response = await fetch(url);
-					if (!response.ok) throw new Error(`API error: ${response.status}`);
-					data = await response.json();
-				} else {
-					data = await fetchEdamamRecipes(query);
-				}
-
-				if (data && data.hits) {
-					const transformedRecipes = data.hits
-						.map((hit) => transformEdamamRecipe(hit))
-						.filter((recipe) => recipe !== null);
-
-					setEdamamRecipes((prevRecipes) =>
-						url ? [...prevRecipes, ...transformedRecipes] : transformedRecipes
-					);
-					setNextPageUrl(data._links?.next?.href || null);
-				}
-			} catch (err) {
-				console.error('Error fetching Edamam recipes:', err);
-				if (edamamRecipes.length === 0) {
-					setEdamamRecipes(fallbackRecipes);
-				}
-			} finally {
-				setEdamamLoading(false);
+			if (url) {
+				const response = await fetch(url);
+				if (!response.ok) throw new Error(`API error: ${response.status}`);
+				data = await response.json();
+			} else {
+				data = await fetchEdamamRecipes(query);
 			}
-		},
-		[edamamRecipes.length]
-	);
+
+			if (data && data.hits) {
+				const transformedRecipes = data.hits
+					.map((hit) => transformEdamamRecipe(hit))
+					.filter((recipe) => recipe !== null);
+
+				setEdamamRecipes((prevRecipes) =>
+					url ? [...prevRecipes, ...transformedRecipes] : transformedRecipes
+				);
+				setNextPageUrl(data._links?.next?.href || null);
+				setHasApiFailure(false); // Reset failure state on success
+			}
+		} catch (err) {
+			console.error('Error fetching Edamam recipes:', err);
+			setApiError(err);
+			setHasApiFailure(true);
+			// Don't set fallback recipes anymore
+		} finally {
+			setEdamamLoading(false);
+		}
+	}, []);
 
 	// Combined recipes from both sources
 	const recipes = useMemo(
@@ -133,7 +95,14 @@ export function useRecipes(options = {}) {
 	);
 
 	const loading = dbLoading || searchDbLoading || edamamLoading;
-	const error = dbError;
+	const error = dbError || apiError;
+
+	// Check if we have any data at all
+	const hasAnyData =
+		dbData?.recipes?.length > 0 ||
+		searchDbData?.searchRecipes?.length > 0 ||
+		edamamRecipes.length > 0;
+	const shouldShowApiStatus = hasApiFailure && !hasAnyData;
 
 	const searchRecipes = useCallback(
 		(query) => {
@@ -185,14 +154,22 @@ export function useRecipes(options = {}) {
 	);
 
 	return {
-		recipes: recipes.length > 0 ? recipes : fallbackRecipes,
+		recipes,
 		loading,
 		error,
 		hasMore: Boolean(nextPageUrl),
 		searchQuery,
+		apiError,
+		hasApiFailure,
+		shouldShowApiStatus,
 		getRecipeById: getRecipeByIdFunc,
 		searchRecipes,
 		loadMoreRecipes,
 		refetchDbRecipes,
+		retryApiConnection: () => {
+			setHasApiFailure(false);
+			setApiError(null);
+			refetchDbRecipes();
+		},
 	};
 }

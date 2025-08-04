@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRecipes } from '@/hooks/useRecipes';
 import RecipeList from '@/components/recipe/RecipeList';
+import ApiStatusPage from '@/components/common/ApiStatusPage';
 
 export default function RecipesPage() {
 	const {
@@ -14,8 +15,21 @@ export default function RecipesPage() {
 		hasMore,
 		loadMoreRecipes,
 		searchQuery,
+		shouldShowApiStatus,
+		retryApiConnection,
 	} = useRecipes();
 	const [query, setQuery] = useState('');
+
+	// If API has failed and we have no data, show the API status page
+	if (shouldShowApiStatus) {
+		return (
+			<ApiStatusPage
+				title='Unable to Load Recipes'
+				message="We're experiencing issues loading recipes from our services."
+				showUsageDetails={true}
+			/>
+		);
+	}
 
 	const handleSearch = (e) => {
 		e.preventDefault();
@@ -28,7 +42,7 @@ export default function RecipesPage() {
 		<div>
 			<div className='mb-6'>
 				<h1 className='text-3xl font-bold text-gray-900'>Browse Recipes</h1>
-				<p className='text-gray-600 mt-2'>
+				<p className='text-gray-900 mt-2'>
 					{searchQuery
 						? `Showing results for "${searchQuery}"`
 						: 'Discover delicious recipes from our collection'}
