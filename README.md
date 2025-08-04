@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Home Made Delites
 
-## Getting Started
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Next.js Version](https://img.shields.io/badge/next.js-15.4.5-blueviolet)
+![React Version](https://img.shields.io/badge/react-19.1.0-blue)
 
-First, run the development server:
+A modern recipe sharing web application built with Next.js and GraphQL where food enthusiasts can discover, share, and save their favorite homemade recipes.
+
+## 🚀 Features
+
+-   **User Authentication**: Secure login and account management
+-   **Recipe Discovery**: Browse and search for recipes by category, ingredients, or popularity
+-   **Personal Profiles**: User dashboards with saved recipes and cooking history
+-   **Responsive Design**: Optimized for desktop and mobile devices
+-   **GraphQL API**: Efficient data fetching and mutations
+
+## 📋 Prerequisites
+
+-   Node.js 18.x or higher
+-   npm 9.x or higher
+
+## ⚙️ Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/home-made-delites.git
+cd home-made-delites
+```
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+1. Set up environment variables:
+
+```bash
+# Create a .env.local file in the root directory with the following variables
+NEXT_PUBLIC_API_URL=your_api_url
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+```
+
+1. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 🧰 Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-   **Framework**: [Next.js](https://nextjs.org/)
+-   **Frontend**: React, Tailwind CSS
+-   **API**: GraphQL with Apollo Server
+-   **Authentication**: JWT with bcrypt
+-   **Database**: MongoDB with Mongoose
+-   **Styling**: Tailwind CSS
 
-## Learn More
+## 🔄 Available Scripts
 
-To learn more about Next.js, take a look at the following resources:
+-   `npm run dev` - Run the development server
+-   `npm run build` - Build the application for production
+-   `npm start` - Start the production server
+-   `npm run lint` - Run ESLint to check code quality
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧪 Testing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Testing framework and guidelines will be added in future updates.
 
-## Deploy on Vercel
+## 📝 API Documentation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The GraphQL API provides the following main operations:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Queries
+
+-   `getRecipes`: Fetch all recipes with optional filtering
+-   `getRecipeById`: Get detailed information about a specific recipe
+-   `getUserProfile`: Get user profile information
+
+### Mutations
+
+-   `createUser`: Register a new user
+-   `loginUser`: Authenticate a user
+-   `createRecipe`: Add a new recipe
+-   `updateRecipe`: Modify an existing recipe
+-   `deleteRecipe`: Remove a recipe
+
+## 🤝 Contributing
+
+1. Fork the repository
+1. Create your feature branch (`git checkout -b feature/amazing-feature`)
+1. Commit your changes (`git commit -m 'Add some amazing feature'`)
+1. Push to the branch (`git push origin feature/amazing-feature`)
+1. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 👏 Acknowledgments
+
+-   Next.js team for the awesome framework
+-   The open-source community for inspiration and tools
+
+---
+
+Built with ❤️ by the Home Made Delites Team
