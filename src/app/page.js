@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRecipes } from '@/hooks/useRecipes';
 import RecipeCard from '@/components/recipe/RecipeCard';
+import RecipeAssistant from '@/components/assistant/RecipeAssistant';
 
 export default function Home() {
 	const { recipes, loading } = useRecipes();
@@ -76,6 +77,22 @@ export default function Home() {
 							className='inline-block bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors'>
 							View All Recipes
 						</Link>
+					</div>
+				</div>
+			</section>
+
+			{/* Recipe Assistant Section */}
+			<section className='py-16 bg-blue-50'>
+				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+					<div className='text-center mb-12'>
+						<h2 className='text-3xl font-bold text-gray-900 mb-4'>Recipe Assistant</h2>
+						<p className='text-lg text-gray-600 mb-4'>
+							Need help with a recipe? Ask our AI-powered recipe assistant!
+						</p>
+					</div>
+
+					<div className='max-w-2xl mx-auto'>
+						<RecipeAssistant />
 					</div>
 				</div>
 			</section>

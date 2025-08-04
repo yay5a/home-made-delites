@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useQuery, useLazyQuery } from '@apollo/client';
+import { GET_RECIPES, SEARCH_RECIPES, GET_RECIPE_BY_ID } from '@/graphql/queries';
 import { fetchEdamamRecipes, transformEdamamRecipe } from '@/utils/edamamUtils';
 
 // Fallback recipes in case API fails
@@ -10,9 +12,11 @@ const fallbackRecipes = [
 		title: 'Classic Chocolate Chip Cookies',
 		description: 'Soft and chewy chocolate chip cookies that are perfect for any occasion.',
 		image: '/images/chocolate-chip-cookies.jpg',
-		prepTime: '15 minutes',
-		cookTime: '12 minutes',
+		prepTime: 15,
+		cookTime: 12,
 		servings: 24,
+		category: 'dessert',
+		difficulty: 'easy',
 		ingredients: [
 			'2 1/4 cups all-purpose flour',
 			'1 tsp baking soda',
@@ -35,31 +39,68 @@ const fallbackRecipes = [
 			'Bake 9 to 11 minutes or until golden brown.',
 			'Cool on baking sheets 2 minutes; remove to wire rack.',
 		],
+		author: {
+			id: 'fallback-author',
+			name: 'Recipe Master',
+			email: 'recipes@homemadedelites.com',
+		},
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
 	},
 ];
 
-export function useRecipes() {
-	const [recipes, setRecipes] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
+export function useRecipes(options = {}) {
+	const { limit = 10, offset = 0, category } = options;
 	const [searchQuery, setSearchQuery] = useState('');
-	const [totalResults, setTotalResults] = useState(0);
+	const [edamamRecipes, setEdamamRecipes] = useState([]);
+	const [edamamLoading, setEdamamLoading] = useState(false);
 	const [nextPageUrl, setNextPageUrl] = useState(null);
 
-	const fetchRecipes = useCallback(
+	// GraphQL query for database recipes
+	const {
+		data: dbData,
+		loading: dbLoading,
+		error: dbError,
+		refetch: refetchDbRecipes,
+	} = useQuery(GET_RECIPES, {
+		variables: { limit, offset, category },
+		errorPolicy: 'all',
+		onError: (error) => {
+			console.error('GraphQL Error fetching recipes:', error);
+		},
+	});
+
+	// Lazy query for search
+	const [searchDbRecipes, { data: searchDbData, loading: searchDbLoading }] = useLazyQuery(
+		SEARCH_RECIPES,
+		{
+			errorPolicy: 'all',
+			onError: (error) => {
+				console.error('GraphQL Error searching recipes:', error);
+			},
+		}
+	);
+
+	// Lazy query for individual recipe
+	const [getRecipeById] = useLazyQuery(GET_RECIPE_BY_ID, {
+		errorPolicy: 'all',
+		onError: (error) => {
+			console.error('GraphQL Error fetching recipe by ID:', error);
+		},
+	});
+
+	// Fetch from Edamam API (external recipes)
+	const fetchEdamamRecipesData = useCallback(
 		async (query = 'popular recipes', url = null) => {
 			try {
-				setLoading(true);
-
+				setEdamamLoading(true);
 				let data;
 
 				if (url) {
-					// Fetch from next page URL if provided
 					const response = await fetch(url);
 					if (!response.ok) throw new Error(`API error: ${response.status}`);
 					data = await response.json();
 				} else {
-					// Fetch with new query
 					data = await fetchEdamamRecipes(query);
 				}
 
@@ -68,58 +109,70 @@ export function useRecipes() {
 						.map((hit) => transformEdamamRecipe(hit))
 						.filter((recipe) => recipe !== null);
 
-					setRecipes((prevRecipes) =>
+					setEdamamRecipes((prevRecipes) =>
 						url ? [...prevRecipes, ...transformedRecipes] : transformedRecipes
 					);
-					setTotalResults(data.count || 0);
 					setNextPageUrl(data._links?.next?.href || null);
-				} else {
-					throw new Error('Invalid API response format');
 				}
 			} catch (err) {
-				console.error('Error fetching recipes:', err);
-				setError(err);
-
-				// Use fallback recipes if API fails
-				if (recipes.length === 0) {
-					setRecipes(fallbackRecipes);
+				console.error('Error fetching Edamam recipes:', err);
+				if (edamamRecipes.length === 0) {
+					setEdamamRecipes(fallbackRecipes);
 				}
 			} finally {
-				setLoading(false);
+				setEdamamLoading(false);
 			}
 		},
-		[recipes.length]
+		[edamamRecipes.length]
 	);
 
-	useEffect(() => {
-		// Initial fetch
-		fetchRecipes();
-	}, [fetchRecipes]);
+	// Combined recipes from both sources
+	const recipes = useMemo(
+		() => [...(dbData?.recipes || []), ...(searchDbData?.searchRecipes || []), ...edamamRecipes],
+		[dbData?.recipes, searchDbData?.searchRecipes, edamamRecipes]
+	);
 
-	const searchRecipesFromAPI = useCallback(
+	const loading = dbLoading || searchDbLoading || edamamLoading;
+	const error = dbError;
+
+	const searchRecipes = useCallback(
 		(query) => {
 			setSearchQuery(query);
-			fetchRecipes(query);
+
+			// Search in database first
+			searchDbRecipes({ variables: { query, limit: 5, offset: 0 } });
+
+			// Then search external API
+			fetchEdamamRecipesData(query);
 		},
-		[fetchRecipes]
+		[searchDbRecipes, fetchEdamamRecipesData]
 	);
 
 	const loadMoreRecipes = useCallback(() => {
 		if (nextPageUrl) {
-			fetchRecipes(searchQuery, nextPageUrl);
+			fetchEdamamRecipesData(searchQuery, nextPageUrl);
 		}
-	}, [nextPageUrl, searchQuery, fetchRecipes]);
+	}, [nextPageUrl, searchQuery, fetchEdamamRecipesData]);
 
-	const getRecipeById = useCallback(
+	const getRecipeByIdFunc = useCallback(
 		async (id) => {
 			// First check if we already have the recipe in our state
 			const existingRecipe = recipes.find((recipe) => recipe.id === id);
-
 			if (existingRecipe) {
 				return existingRecipe;
 			}
 
-			// If not found in state, try to fetch it from API
+			// Try GraphQL first
+			try {
+				const result = await getRecipeById({ variables: { id } });
+				if (result.data?.recipe) {
+					return result.data.recipe;
+				}
+			} catch (err) {
+				console.error('Error fetching recipe from GraphQL:', err);
+			}
+
+			// Fallback to Edamam API
 			try {
 				const { fetchRecipeById } = require('@/utils/edamamUtils');
 				return await fetchRecipeById(id);
@@ -128,18 +181,18 @@ export function useRecipes() {
 				return null;
 			}
 		},
-		[recipes]
+		[recipes, getRecipeById]
 	);
 
 	return {
-		recipes,
+		recipes: recipes.length > 0 ? recipes : fallbackRecipes,
 		loading,
 		error,
-		totalResults,
 		hasMore: Boolean(nextPageUrl),
 		searchQuery,
-		getRecipeById,
-		searchRecipes: searchRecipesFromAPI,
+		getRecipeById: getRecipeByIdFunc,
+		searchRecipes,
 		loadMoreRecipes,
+		refetchDbRecipes,
 	};
 }

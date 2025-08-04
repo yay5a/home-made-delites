@@ -1,6 +1,48 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import ApiQuotaStatus from '@/components/common/ApiQuotaStatus';
+
 export default function Footer() {
+	const pathname = usePathname();
+	const { isAuthenticated, user } = useAuth();
+
+	// Determine if we should show API quota information
+	const shouldShowQuota = () => {
+		// Only show on certain pages
+		const quotaPages = ['/recipes', '/recipe-assistant', '/profile'];
+		const isQuotaPage = quotaPages.some((page) => pathname?.startsWith(page));
+
+		// Only show for authenticated users
+		return isAuthenticated && isQuotaPage;
+	};
+
+	// Check if user is an admin
+	const isAdmin = user?.role === 'admin';
+
 	return (
 		<footer className='bg-gray-800 text-white'>
+			{/* API Quota Section - Only shown on certain pages for authenticated users */}
+			{shouldShowQuota() && (
+				<div className='border-b border-gray-700 py-3'>
+					<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+						<div className='flex items-center justify-between'>
+							<ApiQuotaStatus variant='minimal' />
+
+							{isAdmin && (
+								<Link
+									href='/admin/api-usage'
+									className='text-sm text-blue-300 hover:text-blue-100'>
+									View API Dashboard
+								</Link>
+							)}
+						</div>
+					</div>
+				</div>
+			)}
+
 			<div className='max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8'>
 				<div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
 					<div className='col-span-1 md:col-span-2'>
@@ -35,19 +77,25 @@ export default function Footer() {
 						<h3 className='text-sm font-semibold mb-4 uppercase tracking-wider'>Recipes</h3>
 						<ul className='space-y-2'>
 							<li>
-								<a href='#' className='text-gray-300 hover:text-white'>
+								<Link
+									href='/recipes/category/appetizers'
+									className='text-gray-300 hover:text-white'>
 									Appetizers
-								</a>
+								</Link>
 							</li>
 							<li>
-								<a href='#' className='text-gray-300 hover:text-white'>
+								<Link
+									href='/recipes/category/main-courses'
+									className='text-gray-300 hover:text-white'>
 									Main Courses
-								</a>
+								</Link>
 							</li>
 							<li>
-								<a href='#' className='text-gray-300 hover:text-white'>
+								<Link
+									href='/recipes/category/desserts'
+									className='text-gray-300 hover:text-white'>
 									Desserts
-								</a>
+								</Link>
 							</li>
 							<li>
 								<a href='#' className='text-gray-300 hover:text-white'>

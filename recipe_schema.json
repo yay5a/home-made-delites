@@ -1,0 +1,196 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Edamam Recipe API Response Schema",
+	"description": "Schema for the response returned by Edamam Recipe API",
+	"type": "object",
+	"properties": {
+		"from": {
+			"type": "integer",
+			"description": "Starting index of results"
+		},
+		"to": {
+			"type": "integer",
+			"description": "Ending index of results"
+		},
+		"count": {
+			"type": "integer",
+			"description": "Total count of matches"
+		},
+		"_links": {
+			"type": "object",
+			"description": "Links for pagination",
+			"properties": {
+				"self": {
+					"type": "object",
+					"properties": {
+						"href": { "type": "string" },
+						"title": { "type": "string" }
+					},
+					"required": ["href"]
+				},
+				"next": {
+					"type": "object",
+					"properties": {
+						"href": { "type": "string" },
+						"title": { "type": "string" }
+					},
+					"required": ["href"]
+				}
+			}
+		},
+		"hits": {
+			"type": "array",
+			"description": "Recipe results",
+			"items": {
+				"type": "object",
+				"properties": {
+					"recipe": {
+						"type": "object",
+						"description": "Recipe details",
+						"properties": {
+							"uri": { "type": "string" },
+							"label": { "type": "string" },
+							"image": { "type": "string" },
+							"images": {
+								"type": "object",
+								"description": "Recipe images in different sizes"
+							},
+							"source": { "type": "string" },
+							"url": { "type": "string" },
+							"shareAs": { "type": "string" },
+							"yield": { "type": "number" },
+							"dietLabels": {
+								"type": "array",
+								"items": { "type": "string" }
+							},
+							"healthLabels": {
+								"type": "array",
+								"items": { "type": "string" }
+							},
+							"cautions": {
+								"type": "array",
+								"items": { "type": "string" }
+							},
+							"ingredientLines": {
+								"type": "array",
+								"items": { "type": "string" }
+							},
+							"ingredients": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"text": { "type": "string" },
+										"quantity": { "type": "number" },
+										"measure": { "type": "string" },
+										"food": { "type": "string" },
+										"weight": { "type": "number" },
+										"foodCategory": { "type": "string" }
+									}
+								}
+							},
+							"calories": { "type": "number" },
+							"glycemicIndex": { "type": "number" },
+							"inflammatoryIndex": { "type": "number" },
+							"totalCO2Emissions": { "type": "number" },
+							"co2EmissionsClass": {
+								"type": "string",
+								"enum": ["A+", "A", "B", "C", "D", "E", "F", "G"]
+							},
+							"totalWeight": { "type": "number" },
+							"cuisineType": {
+								"type": "array",
+								"items": { "type": "string" }
+							},
+							"mealType": {
+								"type": "array",
+								"items": { "type": "string" }
+							},
+							"dishType": {
+								"type": "array",
+								"items": { "type": "string" }
+							},
+							"instructions": {
+								"type": "array",
+								"items": { "type": "string" }
+							},
+							"tags": {
+								"type": "array",
+								"items": { "type": "string" }
+							},
+							"externalId": { "type": "string" },
+							"totalNutrients": {
+								"type": "object",
+								"description": "Nutritional information with dynamic keys",
+								"additionalProperties": {
+									"type": "object",
+									"properties": {
+										"label": { "type": "string" },
+										"quantity": { "type": "number" },
+										"unit": { "type": "string" }
+									},
+									"required": ["label", "quantity", "unit"]
+								}
+							},
+							"totalDaily": {
+								"type": "object",
+								"description": "Daily percentage values with dynamic keys",
+								"additionalProperties": {
+									"type": "object",
+									"properties": {
+										"label": { "type": "string" },
+										"quantity": { "type": "number" },
+										"unit": { "type": "string" }
+									},
+									"required": ["label", "quantity", "unit"]
+								}
+							},
+							"digest": {
+								"type": "array",
+								"description": "Digest of nutritional data",
+								"items": {
+									"type": "object",
+									"properties": {
+										"label": { "type": "string" },
+										"tag": { "type": "string" },
+										"schemaOrgTag": { "type": "string" },
+										"total": { "type": "number" },
+										"hasRDI": { "type": "boolean" },
+										"daily": { "type": "number" },
+										"unit": { "type": "string" },
+										"sub": {
+											"type": "object",
+											"description": "Sub-nutrients information"
+										}
+									}
+								}
+							}
+						},
+						"required": ["uri", "label", "ingredients", "calories"]
+					},
+					"_links": {
+						"type": "object",
+						"properties": {
+							"self": {
+								"type": "object",
+								"properties": {
+									"href": { "type": "string" },
+									"title": { "type": "string" }
+								}
+							},
+							"next": {
+								"type": "object",
+								"properties": {
+									"href": { "type": "string" },
+									"title": { "type": "string" }
+								}
+							}
+						}
+					}
+				},
+				"required": ["recipe"]
+			}
+		}
+	},
+	"required": ["from", "to", "count", "hits"]
+}

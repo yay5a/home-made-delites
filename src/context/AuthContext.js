@@ -1,6 +1,10 @@
 'use client';
 
 import { createContext, useContext, useReducer, useEffect } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+import { LOGIN_MUTATION, REGISTER_MUTATION } from '@/graphql/mutations';
+import { GET_USER_PROFILE } from '@/graphql/queries';
+import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
 
@@ -51,40 +55,87 @@ function authReducer(state, action) {
 export function AuthProvider({ children }) {
 	const [state, dispatch] = useReducer(authReducer, initialState);
 
+	// GraphQL mutations
+	const [loginMutation] = useMutation(LOGIN_MUTATION, {
+		onCompleted: (data) => {
+			const { token, user } = data.login;
+			localStorage.setItem('token', token);
+			dispatch({ type: 'LOGIN_SUCCESS', payload: user });
+		},
+		onError: (error) => {
+			dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
+		},
+	});
+
+	const [registerMutation] = useMutation(REGISTER_MUTATION, {
+		onCompleted: (data) => {
+			const { token, user } = data.register;
+			localStorage.setItem('token', token);
+			dispatch({ type: 'LOGIN_SUCCESS', payload: user });
+		},
+		onError: (error) => {
+			dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
+		},
+	});
+
+	// Query for current user profile
+	const { refetch: refetchProfile } = useQuery(GET_USER_PROFILE, {
+		skip: true,
+		onCompleted: (data) => {
+			if (data.me) {
+				dispatch({ type: 'LOGIN_SUCCESS', payload: data.me });
+			}
+		},
+		onError: () => {
+			// Token might be invalid, clear it
+			localStorage.removeItem('token');
+			dispatch({ type: 'SET_LOADING', payload: false });
+		},
+	});
+
 	useEffect(() => {
 		// Check for existing token on mount
 		const token = localStorage.getItem('token');
 		if (token) {
-			// TODO: Validate token with server
-			// For now, just set a mock user
-			dispatch({
-				type: 'LOGIN_SUCCESS',
-				payload: { id: 1, email: 'user@example.com', name: 'Demo User' },
-			});
+			try {
+				// Decode token to check if it's expired
+				const decoded = jwtDecode(token);
+				const currentTime = Date.now() / 1000;
+
+				if (decoded.exp > currentTime) {
+					// Token is valid, fetch user profile
+					refetchProfile();
+				} else {
+					// Token is expired
+					localStorage.removeItem('token');
+					dispatch({ type: 'SET_LOADING', payload: false });
+				}
+			} catch (error) {
+				// Invalid token
+				localStorage.removeItem('token');
+				dispatch({ type: 'SET_LOADING', payload: false });
+			}
 		} else {
 			dispatch({ type: 'SET_LOADING', payload: false });
 		}
-	}, []);
+	}, [refetchProfile]);
 
 	const login = async (email, password) => {
 		dispatch({ type: 'LOGIN_START' });
-
 		try {
-			// TODO: Replace with actual API call
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-
-			if (email === 'demo@example.com' && password === 'password') {
-				const user = { id: 1, email, name: 'Demo User' };
-				const token = 'mock-jwt-token';
-
-				localStorage.setItem('token', token);
-				dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-			} else {
-				throw new Error('Invalid credentials');
-			}
+			await loginMutation({ variables: { email, password } });
 		} catch (error) {
-			dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
+			// Error is handled in onError callback
+			throw error;
+		}
+	};
+
+	const register = async (input) => {
+		dispatch({ type: 'LOGIN_START' });
+		try {
+			await registerMutation({ variables: { input } });
+		} catch (error) {
+			// Error is handled in onError callback
 			throw error;
 		}
 	};
@@ -101,6 +152,7 @@ export function AuthProvider({ children }) {
 	const value = {
 		...state,
 		login,
+		register,
 		logout,
 		clearError,
 	};
