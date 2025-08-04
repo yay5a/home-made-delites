@@ -3,7 +3,7 @@
  * Run with: npm test -- utils/logger.test.js
  */
 
-import logger from '../utils/logger';
+import logger from '@/utils/logger';
 
 // Mock console methods
 global.console = {

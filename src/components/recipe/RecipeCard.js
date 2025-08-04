@@ -1,12 +1,24 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import RecipeLabels from './RecipeLabels';
+import RecipeLabels from '@/components/recipe/RecipeLabels';
+import { PhotoIcon, ClockIcon, UserGroupIcon, FireIcon } from '@heroicons/react/24/outline';
 import { layoutStyles, textStyles, spacingStyles, cx } from '@/styles/styleUtils';
 
 export default function RecipeCard({ recipe }) {
+	// Helper function to format servings display
+	const formatServings = (servings) => {
+		if (!servings) return 'N/A';
+
+		if (typeof servings === 'number') {
+			return `${servings} ${servings === 1 ? 'serving' : 'servings'}`;
+		}
+
+		return servings;
+	};
+
 	return (
 		<div className={cx(layoutStyles.card, layoutStyles.cardHover)}>
-			<div className='relative h-48 w-full'>
+			<div className='relative w-full h-48'>
 				{recipe.image ? (
 					<Image
 						src={recipe.image}
@@ -16,25 +28,14 @@ export default function RecipeCard({ recipe }) {
 						unoptimized={recipe.image.startsWith('http')} // Skip optimization for external URLs
 					/>
 				) : (
-					<div className='w-full h-full bg-gray-200 flex items-center justify-center'>
-						<svg
-							className='w-12 h-12 text-gray-400'
-							fill='none'
-							stroke='currentColor'
-							viewBox='0 0 24 24'>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								strokeWidth={2}
-								d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
-							/>
-						</svg>
+					<div className='flex items-center justify-center w-full h-full bg-gray-200'>
+						<PhotoIcon className='w-12 h-12 text-gray-400' />
 					</div>
 				)}
 
 				{/* Source label if available */}
 				{recipe.source && (
-					<span className='absolute bottom-0 right-0 bg-black bg-opacity-60 text-white text-xs px-2 py-1'>
+					<span className='absolute bottom-0 right-0 px-2 py-1 text-xs text-white bg-black bg-opacity-60'>
 						{recipe.source}
 					</span>
 				)}
@@ -55,70 +56,32 @@ export default function RecipeCard({ recipe }) {
 						mealType: recipe.mealType?.slice(0, 1) || [],
 						co2EmissionsClass: recipe.co2EmissionsClass,
 					}}
-					className='mb-3 gap-1'
+					className='gap-1 mb-3'
 				/>
 
-				<div className='flex items-center justify-between text-sm text-gray-500 mb-4'>
+				<div className='flex items-center justify-between mb-4 text-sm text-gray-500'>
 					{/* Show calories if available */}
 					{recipe.calories > 0 ? (
 						<span className='flex items-center'>
-							<svg
-								className='w-4 h-4 mr-1'
-								fill='none'
-								stroke='currentColor'
-								viewBox='0 0 24 24'>
-								<path
-									strokeLinecap='round'
-									strokeLinejoin='round'
-									strokeWidth={2}
-									d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'
-								/>
-							</svg>
+							<FireIcon className='w-4 h-4 mr-1' />
 							{Math.round(recipe.calories)} cal
 						</span>
 					) : (
 						<span className='flex items-center'>
-							<svg
-								className='w-4 h-4 mr-1'
-								fill='none'
-								stroke='currentColor'
-								viewBox='0 0 24 24'>
-								<path
-									strokeLinecap='round'
-									strokeLinejoin='round'
-									strokeWidth={2}
-									d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
-								/>
-							</svg>
+							<ClockIcon className='w-4 h-4 mr-1' />
 							{recipe.prepTime || 'N/A'}
 						</span>
 					)}
 
 					<span className='flex items-center'>
-						<svg
-							className='w-4 h-4 mr-1'
-							fill='none'
-							stroke='currentColor'
-							viewBox='0 0 24 24'>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								strokeWidth={2}
-								d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'
-							/>
-						</svg>
-						{recipe.servings || 'N/A'}{' '}
-						{typeof recipe.servings === 'number'
-							? recipe.servings === 1
-								? 'serving'
-								: 'servings'
-							: ''}
+						<UserGroupIcon className='w-4 h-4 mr-1' />
+						{formatServings(recipe.servings)}
 					</span>
 				</div>
 
 				<Link
 					href={`/recipes/${recipe.id}`}
-					className='inline-block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200'>
+					className='inline-block w-full px-4 py-2 text-center text-white transition-colors duration-200 bg-blue-600 rounded-md hover:bg-blue-700'>
 					View Recipe
 				</Link>
 			</div>

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { API_LIMITS } from './config/apiLimits';
+import { API_LIMITS } from '@/config/apiLimits';
 
 /**
  * In-memory rate limiting for Edge Runtime using Web Caches
@@ -34,9 +34,6 @@ export async function middleware(request) {
 	let isRateLimited = false;
 	let rateLimitType = '';
 
-	// Check if this is an assistant API call
-	const isAssistantCall = url.pathname.includes('/api/assistant/');
-
 	// ===== MINUTE-BASED RATE LIMITING =====
 	// Reset counters older than 1 minute
 	for (const [key, value] of minuteWindowCache.entries()) {
@@ -45,8 +42,8 @@ export async function middleware(request) {
 		}
 	}
 
-	// Check/update minute-based limit (only for regular API calls)
-	if (!isAssistantCall) {
+	// Check/update minute-based limit
+	{
 		const minuteKey = `${ip}-minute`;
 		const minuteData = minuteWindowCache.get(minuteKey) || { count: 0, timestamp: now };
 
@@ -57,28 +54,6 @@ export async function middleware(request) {
 			// Increment counter
 			minuteData.count += 1;
 			minuteWindowCache.set(minuteKey, minuteData);
-		}
-	}
-
-	// ===== DAY-BASED RATE LIMITING (ASSISTANT) =====
-	if (isAssistantCall && !isRateLimited) {
-		// Reset counters older than 1 day
-		for (const [key, value] of dayWindowCache.entries()) {
-			if (now - value.timestamp > DAY) {
-				dayWindowCache.delete(key);
-			}
-		}
-
-		const dayKey = `${ip}-day`;
-		const dayData = dayWindowCache.get(dayKey) || { count: 0, timestamp: now };
-
-		if (dayData.count >= API_LIMITS.ASSISTANT_CALLS_PER_DAY) {
-			isRateLimited = true;
-			rateLimitType = 'day-assistant';
-		} else {
-			// Increment counter
-			dayData.count += 1;
-			dayWindowCache.set(dayKey, dayData);
 		}
 	}
 
@@ -120,15 +95,12 @@ export async function middleware(request) {
 			'X-RateLimit-Limit',
 			rateLimitType === 'minute'
 				? String(API_LIMITS.HITS_PER_MINUTE)
-				: rateLimitType === 'day-assistant'
-				? String(API_LIMITS.ASSISTANT_CALLS_PER_DAY)
 				: String(API_LIMITS.HITS_PER_MONTH)
 		);
 		response.headers.set('X-RateLimit-Remaining', '0');
 
 		// Set retry-after header
-		const retryAfter =
-			rateLimitType === 'minute' ? '60' : rateLimitType === 'day-assistant' ? '86400' : '2592000'; // seconds
+		const retryAfter = rateLimitType === 'minute' ? '60' : '2592000'; // seconds
 		response.headers.set('Retry-After', retryAfter);
 
 		return response;

@@ -12,12 +12,9 @@
 		"test:watch": "jest --watch"
 	},
 	"dependencies": {
-		"@apollo/client": "^3.13.9",
-		"@apollo/server": "^5.0.0",
-		"@as-integrations/next": "^4.0.0",
+		"@heroicons/react": "^2.2.0",
 		"bcrypt": "^6.0.0",
-		"graphql": "^16.11.0",
-		"graphql-tag": "^2.12.6",
+		"bcryptjs": "^3.0.2",
 		"jsonwebtoken": "^9.0.2",
 		"jwt-decode": "^4.0.0",
 		"mongoose": "^8.17.0",

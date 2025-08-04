@@ -8,9 +8,12 @@ import RecipeAssistantPopup from '@/components/assistant/RecipeAssistantPopup';
 import ApiStatusPage from '@/components/common/ApiStatusPage';
 
 export default function Home() {
-	const { recipes, loading, shouldShowApiStatus, retryApiConnection } = useRecipes();
+	const { recipes, loading, shouldShowApiStatus, retryApiConnection, searchRecipes } = useRecipes();
 	const [featuredRecipes, setFeaturedRecipes] = useState([]);
 	const [featuredLoading, setFeaturedLoading] = useState(true);
+	const [searchCount, setSearchCount] = useState(0);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [showSearchLimit, setShowSearchLimit] = useState(false);
 
 	// Get random featured recipes from both database and Edamam API
 	useEffect(() => {
@@ -28,7 +31,7 @@ export default function Home() {
 
 				// Fetch some popular recipes from Edamam API to complement
 				try {
-					const { fetchEdamamRecipes } = await import('@/utils/edamamUtils');
+					const { fetchEdamamRecipes } = await import('@/utils/edamamClient');
 					const popularQueries = [
 						'popular chicken recipes',
 						'quick pasta',
@@ -43,7 +46,7 @@ export default function Home() {
 					const edamamData = await fetchEdamamRecipes(randomQuery, { limit: 6 });
 
 					if (edamamData && edamamData.hits) {
-						const { transformEdamamRecipe } = await import('@/utils/edamamUtils');
+						const { transformEdamamRecipe } = await import('@/utils/recipeTransformer');
 						const edamamRecipes = edamamData.hits
 							.map((hit) => transformEdamamRecipe(hit))
 							.filter((recipe) => recipe && recipe.title);
@@ -97,7 +100,7 @@ export default function Home() {
 		setFeaturedLoading(true);
 
 		try {
-			const { fetchEdamamRecipes } = await import('@/utils/edamamUtils');
+			const { fetchEdamamRecipes } = await import('@/utils/edamamClient');
 			const popularQueries = [
 				'italian cuisine',
 				'mexican food',
@@ -112,7 +115,7 @@ export default function Home() {
 			const edamamData = await fetchEdamamRecipes(randomQuery, { limit: 6 });
 
 			if (edamamData && edamamData.hits) {
-				const { transformEdamamRecipe } = await import('@/utils/edamamUtils');
+				const { transformEdamamRecipe } = await import('@/utils/recipeTransformer');
 				const edamamRecipes = edamamData.hits
 					.map((hit) => transformEdamamRecipe(hit))
 					.filter((recipe) => recipe && recipe.title);
@@ -130,45 +133,85 @@ export default function Home() {
 		<div className='bg-gray-50'>
 			{/* Hero Section */}
 			<section className='bg-white'>
-				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16'>
+				<div className='px-4 py-16 mx-auto max-w-7xl sm:px-6 lg:px-8'>
 					<div className='text-center'>
-						<h1 className='text-4xl md:text-6xl font-bold text-gray-900 mb-6'>
+						<h1 className='mb-6 text-4xl font-bold text-gray-900 md:text-6xl'>
 							Welcome to <span className='text-blue-600'>Home Made Delites</span>
 						</h1>
-						<p className='text-xl text-gray-600 mb-8 max-w-3xl mx-auto'>
+						<p className='max-w-3xl mx-auto mb-8 text-xl text-gray-600'>
 							Discover, create, and share delicious homemade recipes with our community of
 							passionate home cooks. From family classics to innovative creations, find
 							your next favorite dish here.
 						</p>
-						<div className='flex flex-col sm:flex-row gap-4 justify-center'>
-							<Link
-								href='/recipes'
-								className='bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors'>
-								Browse Recipes
-							</Link>
-							<Link
-								href='/login'
-								className='border border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors'>
-								Join Our Community
-							</Link>
-						</div>
+						<form
+							onSubmit={(e) => {
+								e.preventDefault();
+								if (searchCount >= 2) {
+									setShowSearchLimit(true);
+									return;
+								}
+								if (searchQuery.trim()) {
+									searchRecipes(searchQuery);
+									setSearchCount((prev) => prev + 1);
+								}
+							}}
+							className='max-w-2xl mx-auto mb-6'>
+							<div className='flex flex-col gap-4 sm:flex-row'>
+								<input
+									type='text'
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
+									placeholder='Search recipes (e.g., chicken pasta, vegetarian)'
+									className='flex-grow px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+								/>
+								<button
+									type='submit'
+									disabled={searchCount >= 2}
+									className='px-8 py-3 font-semibold text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed'>
+									{searchCount >= 2 ? 'Search Limit Reached' : 'Search Recipes'}
+								</button>
+							</div>
+							{showSearchLimit && (
+								<div className='mt-4 text-center text-red-600'>
+									<p>
+										You&apos;ve reached the search limit.{' '}
+										<Link href='/login' className='font-semibold underline'>
+											Sign up
+										</Link>{' '}
+										for unlimited searches!
+									</p>
+								</div>
+							)}
+							<div className='flex justify-center gap-4 mt-6'>
+								<Link
+									href='/recipes'
+									className='px-6 py-2 font-semibold text-blue-600 transition-colors border border-blue-600 rounded-lg hover:bg-blue-50'>
+									Browse All Recipes
+								</Link>
+								<Link
+									href='/login'
+									className='px-6 py-2 font-semibold text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700'>
+									Join Our Community
+								</Link>
+							</div>
+						</form>
 					</div>
 				</div>
 			</section>
 
 			{/* Featured Recipes Section */}
 			<section className='py-16'>
-				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-					<div className='text-center mb-12'>
-						<h2 className='text-3xl font-bold text-gray-900 mb-4'>Featured Recipes</h2>
-						<p className='text-lg text-gray-600 mb-4'>
+				<div className='px-4 mx-auto max-w-7xl sm:px-6 lg:px-8'>
+					<div className='mb-12 text-center'>
+						<h2 className='mb-4 text-3xl font-bold text-gray-900'>Featured Recipes</h2>
+						<p className='mb-4 text-lg text-gray-600'>
 							Discover a delicious mix of popular recipes from our community and around the
 							world
 						</p>
 						<button
 							onClick={refreshFeaturedRecipes}
 							disabled={featuredLoading}
-							className='inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed'>
+							className='inline-flex items-center gap-2 font-medium text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed'>
 							<svg
 								className='w-4 h-4'
 								fill='none'
@@ -186,43 +229,43 @@ export default function Home() {
 					</div>
 
 					{featuredLoading ? (
-						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+						<div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
 							{[1, 2, 3, 4, 5, 6].map((i) => (
 								<div
 									key={i}
-									className='bg-white rounded-lg shadow-md overflow-hidden animate-pulse'>
+									className='overflow-hidden bg-white rounded-lg shadow-md animate-pulse'>
 									<div className='h-48 bg-gray-200'></div>
 									<div className='p-6'>
-										<div className='h-6 bg-gray-200 rounded mb-2'></div>
-										<div className='h-4 bg-gray-200 rounded mb-4'></div>
+										<div className='h-6 mb-2 bg-gray-200 rounded'></div>
+										<div className='h-4 mb-4 bg-gray-200 rounded'></div>
 										<div className='h-10 bg-gray-200 rounded'></div>
 									</div>
 								</div>
 							))}
 						</div>
 					) : featuredRecipes.length > 0 ? (
-						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+						<div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
 							{featuredRecipes.map((recipe, index) => (
 								<RecipeCard key={recipe.id || recipe.uri || index} recipe={recipe} />
 							))}
 						</div>
 					) : (
-						<div className='text-center py-12'>
-							<p className='text-gray-500 mb-4'>
+						<div className='py-12 text-center'>
+							<p className='mb-4 text-gray-500'>
 								No featured recipes available at the moment.
 							</p>
 							<Link
 								href='/recipes'
-								className='text-blue-600 hover:text-blue-800 font-semibold'>
+								className='font-semibold text-blue-600 hover:text-blue-800'>
 								Browse all recipes →
 							</Link>
 						</div>
 					)}
 
-					<div className='text-center mt-8'>
+					<div className='mt-8 text-center'>
 						<Link
 							href='/recipes'
-							className='inline-block bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors'>
+							className='inline-block px-6 py-3 font-semibold text-white transition-colors bg-gray-900 rounded-lg hover:bg-gray-800'>
 							View All Recipes
 						</Link>
 					</div>
@@ -230,17 +273,17 @@ export default function Home() {
 			</section>
 
 			{/* Features Section */}
-			<section className='bg-white py-16'>
-				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-					<div className='text-center mb-12'>
-						<h2 className='text-3xl font-bold text-gray-900 mb-4'>
+			<section className='py-16 bg-white'>
+				<div className='px-4 mx-auto max-w-7xl sm:px-6 lg:px-8'>
+					<div className='mb-12 text-center'>
+						<h2 className='mb-4 text-3xl font-bold text-gray-900'>
 							Why Choose Home Made Delites?
 						</h2>
 					</div>
 
-					<div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+					<div className='grid grid-cols-1 gap-8 md:grid-cols-3'>
 						<div className='text-center'>
-							<div className='bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4'>
+							<div className='flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full'>
 								<svg
 									className='w-8 h-8 text-blue-600'
 									fill='none'
@@ -254,7 +297,7 @@ export default function Home() {
 									/>
 								</svg>
 							</div>
-							<h3 className='text-xl font-semibold text-gray-900 mb-2'>Curated Recipes</h3>
+							<h3 className='mb-2 text-xl font-semibold text-gray-900'>Curated Recipes</h3>
 							<p className='text-gray-600'>
 								Handpicked recipes from home cooks around the world, tested and loved by
 								our community.
@@ -262,7 +305,7 @@ export default function Home() {
 						</div>
 
 						<div className='text-center'>
-							<div className='bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4'>
+							<div className='flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full'>
 								<svg
 									className='w-8 h-8 text-green-600'
 									fill='none'
@@ -276,7 +319,7 @@ export default function Home() {
 									/>
 								</svg>
 							</div>
-							<h3 className='text-xl font-semibold text-gray-900 mb-2'>
+							<h3 className='mb-2 text-xl font-semibold text-gray-900'>
 								Community Driven
 							</h3>
 							<p className='text-gray-600'>
@@ -286,7 +329,7 @@ export default function Home() {
 						</div>
 
 						<div className='text-center'>
-							<div className='bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4'>
+							<div className='flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-yellow-100 rounded-full'>
 								<svg
 									className='w-8 h-8 text-yellow-600'
 									fill='none'
@@ -300,7 +343,7 @@ export default function Home() {
 									/>
 								</svg>
 							</div>
-							<h3 className='text-xl font-semibold text-gray-900 mb-2'>Easy to Follow</h3>
+							<h3 className='mb-2 text-xl font-semibold text-gray-900'>Easy to Follow</h3>
 							<p className='text-gray-600'>
 								Step-by-step instructions with helpful tips to ensure your cooking
 								success every time.

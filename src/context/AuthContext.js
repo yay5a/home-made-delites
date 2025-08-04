@@ -1,170 +1,77 @@
 'use client';
 
-import { createContext, useContext, useReducer, useEffect } from 'react';
-import { useMutation, useQuery } from '@apollo/client';
-import { LOGIN_MUTATION, REGISTER_MUTATION } from '@/graphql/mutations';
-import { GET_USER_PROFILE } from '@/graphql/queries';
-import { jwtDecode } from 'jwt-decode';
+import { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext();
-
-const initialState = {
+const AuthContext = createContext({
 	user: null,
 	isAuthenticated: false,
-	isLoading: true,
-	error: null,
-};
-
-function authReducer(state, action) {
-	switch (action.type) {
-		case 'LOGIN_START':
-			return { ...state, isLoading: true, error: null };
-		case 'LOGIN_SUCCESS':
-			return {
-				...state,
-				user: action.payload,
-				isAuthenticated: true,
-				isLoading: false,
-				error: null,
-			};
-		case 'LOGIN_FAILURE':
-			return {
-				...state,
-				user: null,
-				isAuthenticated: false,
-				isLoading: false,
-				error: action.payload,
-			};
-		case 'LOGOUT':
-			return {
-				...state,
-				user: null,
-				isAuthenticated: false,
-				isLoading: false,
-				error: null,
-			};
-		case 'SET_LOADING':
-			return { ...state, isLoading: action.payload };
-		case 'CLEAR_ERROR':
-			return { ...state, error: null };
-		default:
-			return state;
-	}
-}
+	login: async () => {},
+	logout: () => {},
+	register: async () => {},
+});
 
 export function AuthProvider({ children }) {
-	const [state, dispatch] = useReducer(authReducer, initialState);
-
-	const handleAuthSuccess = (data) => {
-		const authData = data.login || data.register;
-		if (authData) {
-			const { token, user } = authData;
-			localStorage.setItem('token', token);
-			dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-		}
-	};
-
-	const handleAuthError = (error) => {
-		dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
-	};
-
-	// GraphQL mutations
-	const [loginMutation] = useMutation(LOGIN_MUTATION, {
-		onCompleted: handleAuthSuccess,
-		onError: handleAuthError,
-	});
-
-	const [registerMutation] = useMutation(REGISTER_MUTATION, {
-		onCompleted: handleAuthSuccess,
-		onError: handleAuthError,
-	});
-
-	// Query for current user profile
-	const { refetch: refetchProfile } = useQuery(GET_USER_PROFILE, {
-		skip: true,
-		onCompleted: (data) => {
-			if (data.me) {
-				dispatch({ type: 'LOGIN_SUCCESS', payload: data.me });
-			}
-		},
-		onError: () => {
-			// Token might be invalid, clear it
-			localStorage.removeItem('token');
-			dispatch({ type: 'SET_LOADING', payload: false });
-		},
-	});
+	const [user, setUser] = useState(null);
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 	useEffect(() => {
-		// Check for existing token on mount
-		const token = localStorage.getItem('token');
+		// Check for stored auth token
+		const token = localStorage.getItem('auth_token');
 		if (token) {
-			try {
-				// Decode token to check if it's expired
-				const decoded = jwtDecode(token);
-				const currentTime = Date.now() / 1000;
-
-				if (decoded.exp > currentTime) {
-					// Token is valid, fetch user profile
-					refetchProfile();
-				} else {
-					// Token is expired
-					localStorage.removeItem('token');
-					dispatch({ type: 'SET_LOADING', payload: false });
-				}
-			} catch (error) {
-				// Invalid token
-				localStorage.removeItem('token');
-				dispatch({ type: 'SET_LOADING', payload: false });
-			}
-		} else {
-			dispatch({ type: 'SET_LOADING', payload: false });
+			// For POC, just set as authenticated if token exists
+			setIsAuthenticated(true);
+			setUser({ id: 1 }); // Minimal user object for POC
 		}
-	}, [refetchProfile]);
+	}, []);
 
 	const login = async (email, password) => {
-		dispatch({ type: 'LOGIN_START' });
-		try {
-			await loginMutation({ variables: { email, password } });
-		} catch (error) {
-			// Error is handled in onError callback
-			throw error;
+		const response = await fetch('/api/auth/login', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email, password }),
+		});
+
+		if (!response.ok) {
+			const error = await response.json();
+			throw new Error(error.error || 'Login failed');
 		}
+
+		const { token } = await response.json();
+		localStorage.setItem('auth_token', token);
+		setIsAuthenticated(true);
+		setUser({ email }); // We'll decode more user info from token later if needed
 	};
 
-	const register = async (input) => {
-		dispatch({ type: 'LOGIN_START' });
-		try {
-			await registerMutation({ variables: { input } });
-		} catch (error) {
-			// Error is handled in onError callback
-			throw error;
-		}
-	};
+	const register = async (email, password) => {
+		const response = await fetch('/api/auth/register', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email, password }),
+		});
 
+		if (!response.ok) {
+			const error = await response.json();
+			throw new Error(error.error || 'Registration failed');
+		}
+
+		const { token } = await response.json();
+		localStorage.setItem('auth_token', token);
+		setIsAuthenticated(true);
+		setUser({ email });
+	};
 	const logout = () => {
-		localStorage.removeItem('token');
-		dispatch({ type: 'LOGOUT' });
+		localStorage.removeItem('auth_token');
+		setUser(null);
+		setIsAuthenticated(false);
 	};
 
-	const clearError = () => {
-		dispatch({ type: 'CLEAR_ERROR' });
-	};
-
-	const value = {
-		...state,
-		login,
-		register,
-		logout,
-		clearError,
-	};
-
-	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+	return (
+		<AuthContext.Provider value={{ user, isAuthenticated, login, logout, register }}>
+			{children}
+		</AuthContext.Provider>
+	);
 }
 
 export function useAuthContext() {
-	const context = useContext(AuthContext);
-	if (!context) {
-		throw new Error('useAuthContext must be used within an AuthProvider');
-	}
-	return context;
+	return useContext(AuthContext);
 }
