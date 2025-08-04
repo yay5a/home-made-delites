@@ -1,4 +1,4 @@
-// Server-side API rate limiting functionality
+// Server-side API rate limiting functionality - Optimized version
 // Only import this file on server-side code (API routes, Server Components)
 
 import dbConnect from '../lib/mongoose';
@@ -10,17 +10,6 @@ import logger from '@/utils/logger';
 const MINUTE = 60 * 1000;
 const DAY = 24 * 60 * 60 * 1000;
 const MONTH = 30 * DAY; // Approximate
-
-/**
- * Calculate time until reset: window - elapsed since last reset
- * @param {Date} lastResetDate
- * @param {number} windowMs
- * @param {number} now
- * @returns {number}
- */
-function calculateResetIn(lastResetDate, windowMs, now) {
-	return windowMs - (now - lastResetDate.getTime());
-}
 
 /**
  * Get or create usage tracker with automatic reset functionality
@@ -118,30 +107,27 @@ export async function trackApiUsage(type = 'edamam', tokens = 0) {
 	// Save changes in one go
 	await tracker.save();
 	return true;
-	return true;
 }
 
 /**
- * Get current API usage statistics
- * @returns {Promise<Object>} - API usage statistics
+ * Get current API usage statistics - optimized version
+ * @returns {Promise<Object>} - API usage statistics with all counters
  */
 export async function getApiUsage() {
 	const tracker = await getOrCreateTracker();
-	// Compute current timestamp once
-	const now = Date.now();
 
 	// All data is now directly available, no need for aggregation
 	return {
 		edamamHits: {
 			minute: tracker.minuteHits,
 			thisMonth: tracker.monthHits,
-			minuteResetIn: calculateResetIn(tracker.lastMinuteReset, MINUTE, now),
-			monthResetIn: calculateResetIn(tracker.lastMonthReset, MONTH, now),
+			minuteResetIn: MINUTE - (Date.now() - tracker.lastMinuteReset.getTime()),
+			monthResetIn: MONTH - (Date.now() - tracker.lastMonthReset.getTime()),
 		},
 		assistantCalls: {
 			today: tracker.dayAssistantCalls,
 			thisMonth: tracker.monthAssistantCalls,
-			dayResetIn: calculateResetIn(tracker.lastDayReset, DAY, now),
+			dayResetIn: DAY - (Date.now() - tracker.lastDayReset.getTime()),
 		},
 		assistantTokens: {
 			today: tracker.dayAssistantTokens,

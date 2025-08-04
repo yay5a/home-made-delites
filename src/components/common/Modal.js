@@ -35,22 +35,25 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
 		sm: 'max-w-md',
 		md: 'max-w-lg',
 		lg: 'max-w-2xl',
+		large: 'max-w-4xl',
 		xl: 'max-w-4xl',
 	};
 
 	return (
 		<div
 			ref={modalRef}
-			className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50'
+			className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70'
 			onClick={handleBackdropClick}>
 			<div
-				className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-y-auto`}>
+				className={`bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-y-auto`}>
 				{title && (
-					<div className='flex items-center justify-between p-6 border-b border-gray-200'>
-						<h3 className='text-lg font-semibold text-gray-900'>{title}</h3>
+					<div className='flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700'>
+						<h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>
+							{title}
+						</h3>
 						<button
 							onClick={onClose}
-							className='text-gray-400 hover:text-gray-600 focus:outline-none'>
+							className='text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none'>
 							<svg
 								className='w-6 h-6'
 								fill='none'

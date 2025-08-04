@@ -1,5 +1,6 @@
 // API route for user recipe interactions (likes, saves)
 import { NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import dbConnect from '@/lib/mongoose';
 import { saveRecipeInteraction, getUserRecipes } from '@/lib/recipeDb.server';
 import { verifyToken } from '@/lib/authService';
@@ -22,7 +23,7 @@ export async function GET(request) {
 
 		return NextResponse.json(userRecipes);
 	} catch (error) {
-		console.error('Error fetching user recipes:', error);
+		logger.error('Error fetching user recipes:', error);
 		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }
@@ -69,7 +70,7 @@ export async function POST(request) {
 			recipe: updatedRecipe,
 		});
 	} catch (error) {
-		console.error('Error processing recipe interaction:', error);
+		logger.error('Error processing recipe interaction:', error);
 		return NextResponse.json({ error: 'Failed to process recipe interaction' }, { status: 400 });
 	}
 }

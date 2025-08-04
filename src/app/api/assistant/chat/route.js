@@ -1,5 +1,6 @@
 // API route for recipe assistant
 import { NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 
 // This would be replaced with actual OpenAI or other AI service integration
 const MOCK_RESPONSES = [
@@ -53,13 +54,16 @@ export async function POST(request) {
 		// Simulate API delay
 		await new Promise((resolve) => setTimeout(resolve, 1000));
 
+		// Import token counter for accurate token estimation
+		const { countTokens } = await import('@/utils/tokenCounter');
+
 		return NextResponse.json({
 			reply: contextualizedResponse,
-			promptTokens: prompt.length / 4, // Rough estimation
-			completionTokens: contextualizedResponse.length / 4, // Rough estimation
+			promptTokens: countTokens(prompt),
+			completionTokens: countTokens(contextualizedResponse),
 		});
 	} catch (error) {
-		console.error('Recipe assistant error:', error);
+		logger.error('Recipe assistant error:', error);
 		return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
 	}
 }

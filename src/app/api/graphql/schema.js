@@ -81,12 +81,30 @@ export const typeDefs = gql`
 		sodium: Float
 	}
 
+	type PaginatedRecipes {
+		recipes: [Recipe!]!
+		pageInfo: PageInfo!
+	}
+
+	type PageInfo {
+		hasMore: Boolean!
+		nextCursor: String
+		prevCursor: String
+		totalResults: Int
+	}
+
 	type Query {
 		me: User
-		recipes(limit: Int, offset: Int, category: String): [Recipe!]!
+		recipes(limit: Int, cursor: String, forward: Boolean, category: String): PaginatedRecipes!
 		recipe(id: ID!): Recipe
-		searchRecipes(query: String!, limit: Int, offset: Int): [Recipe!]!
-		userRecipes(userId: ID!): [Recipe!]!
+		searchRecipes(query: String!, limit: Int, cursor: String, forward: Boolean): PaginatedRecipes!
+		userRecipes(
+			userId: ID!
+			type: String
+			limit: Int
+			cursor: String
+			forward: Boolean
+		): PaginatedRecipes!
 	}
 
 	type Mutation {

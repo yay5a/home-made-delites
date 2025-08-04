@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import ApiUsage from '@/models/ApiUsage';
 import dbConnect from '@/lib/mongoose';
 import { verifyToken } from '@/lib/authService';
@@ -95,7 +96,7 @@ export async function GET(request) {
 			data: usageStats,
 		});
 	} catch (error) {
-		console.error('Error fetching API usage statistics:', error);
+		logger.error('Error fetching API usage statistics:', error);
 		return NextResponse.json(
 			{ success: false, error: 'Failed to retrieve API usage statistics' },
 			{ status: 500 }
@@ -171,7 +172,7 @@ export async function POST(request) {
 
 		return NextResponse.json({ success: true });
 	} catch (error) {
-		console.error('Error resetting API usage counters:', error);
+		logger.error('Error resetting API usage counters:', error);
 		return NextResponse.json(
 			{ success: false, error: 'Failed to reset API usage counters' },
 			{ status: 500 }

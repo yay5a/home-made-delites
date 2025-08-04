@@ -1,5 +1,6 @@
 // API route for recipes
 import { NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { searchRecipes, findRecipeById } from '@/lib/recipeDb.server';
 
 export async function GET(request) {
@@ -33,7 +34,7 @@ export async function GET(request) {
 		const results = await searchRecipes(criteria, page, limit);
 		return NextResponse.json(results);
 	} catch (error) {
-		console.error('Error in recipe API route:', error);
+		logger.error('Error in recipe API route:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
 	}
 }
@@ -51,7 +52,7 @@ export async function POST(request) {
 
 		return NextResponse.json(recipe, { status: 201 });
 	} catch (error) {
-		console.error('Error creating recipe:', error);
+		logger.error('Error creating recipe:', error);
 		return NextResponse.json({ error: 'Failed to create recipe' }, { status: 400 });
 	}
 }

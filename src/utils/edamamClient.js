@@ -1,6 +1,7 @@
 import { validateResponseStructure, validateRecipe } from './edamamValidator';
 import { transformEdamamRecipe } from './recipeTransformer';
 import { API_LIMITS as IMPORTED_API_LIMITS } from '@/config/apiLimits';
+import logger from '@/utils/logger';
 
 // Base URL for Edamam API
 const EDAMAM_BASE_URL = 'https://api.edamam.com/api/recipes/v2';
@@ -49,7 +50,7 @@ export async function fetchEdamamRecipes(query, options = {}) {
 
 		return data;
 	} catch (error) {
-		console.error('Error fetching from Edamam API:', error);
+		logger.error('Error fetching from Edamam API', error);
 		throw error;
 	}
 }
@@ -69,7 +70,6 @@ export async function fetchRecipeById(id, bypassCache = false) {
 		if (!bypassCache) {
 			const dbRecipe = await findRecipeById(id);
 			if (dbRecipe) {
-				console.log('Using MongoDB cached recipe:', id);
 				return dbRecipe;
 			}
 
@@ -115,7 +115,7 @@ export async function fetchRecipeById(id, bypassCache = false) {
 
 		// Check if response matches our expected structure
 		if (!data || !data.recipe) {
-			console.error('Unexpected API response format:', data);
+			logger.error('Unexpected API response format', data);
 			return null;
 		}
 
@@ -138,7 +138,7 @@ export async function fetchRecipeById(id, bypassCache = false) {
 
 			return transformedRecipe;
 		} catch (validationError) {
-			console.error('Recipe validation error:', validationError);
+			logger.error('Recipe validation error', validationError);
 			// Still return transformed data, but log the error
 			const transformedRecipe = transformEdamamRecipe({ recipe: data.recipe });
 
@@ -150,33 +150,102 @@ export async function fetchRecipeById(id, bypassCache = false) {
 				}
 				await saveRecipeToDb(transformedRecipe);
 			} catch (dbError) {
-				console.error('Error saving recipe to database:', dbError);
+				logger.error('Error saving recipe to database', dbError);
 			}
 
 			return transformedRecipe;
 		}
 	} catch (error) {
-		console.error('Error fetching recipe by ID:', error);
+		logger.error('Error fetching recipe by ID', error);
 		return null;
 	}
 }
 
-// In-memory cache for recipes and search results
+// Enhanced in-memory cache for recipes and search results using Map for better performance
+class TTLCache {
+	constructor(ttl) {
+		this.cache = new Map();
+		this.defaultTTL = ttl;
+
+		// Run cleanup every minute to remove expired items
+		this.interval = setInterval(() => this.cleanup(), 60000);
+	}
+
+	// Stop the cleanup interval
+	stop() {
+		if (this.interval) {
+			clearInterval(this.interval);
+			this.interval = null;
+		}
+	}
+
+	// Clean up expired entries
+	cleanup() {
+		const now = Date.now();
+		for (const [key, { expiry }] of this.cache.entries()) {
+			if (expiry <= now) {
+				this.cache.delete(key);
+			}
+		}
+	}
+
+	// Set a value with optional TTL
+	set(key, value, ttl = this.defaultTTL) {
+		this.cache.set(key, {
+			data: value,
+			expiry: Date.now() + ttl,
+		});
+	}
+
+	// Get a value (returns null if expired or not found)
+	get(key) {
+		const entry = this.cache.get(key);
+		const now = Date.now();
+
+		if (!entry) return null;
+
+		// Auto-delete if expired
+		if (entry.expiry <= now) {
+			this.cache.delete(key);
+			return null;
+		}
+
+		return entry.data;
+	}
+
+	// Check if cache has a non-expired key
+	has(key) {
+		const entry = this.cache.get(key);
+		if (!entry) return false;
+
+		if (entry.expiry <= Date.now()) {
+			this.cache.delete(key);
+			return false;
+		}
+
+		return true;
+	}
+
+	// Clear the entire cache
+	clear() {
+		this.cache.clear();
+	}
+}
+
+// Create separate caches with different TTLs
 const cache = {
-	searches: {}, // Store search results
-	recipes: {}, // Store individual recipes
+	searches: new TTLCache(15 * 60 * 1000), // 15 minutes for search results
+	recipes: new TTLCache(60 * 60 * 1000), // 1 hour for individual recipes
+
 	getCacheKey: (query, options = {}) => {
 		// Create a unique key based on the query and options
 		const optionsStr = options ? JSON.stringify(options) : '';
 		return `${query}${optionsStr}`;
 	},
-	cacheSearch: (query, options = {}, data, ttl = 15 * 60 * 1000) => {
-		// Cache search results for 15 minutes (adjustable)
+
+	cacheSearch: (query, options = {}, data, ttl) => {
 		const key = cache.getCacheKey(query, options);
-		cache.searches[key] = {
-			data,
-			expiry: Date.now() + ttl,
-		};
+		cache.searches.set(key, data, ttl);
 
 		// Also cache individual recipes from search results
 		if (data && data.hits && Array.isArray(data.hits)) {
@@ -185,42 +254,24 @@ const cache = {
 					const idMatch = hit.recipe.uri.match(/recipe_([a-zA-Z0-9]+)/);
 					if (idMatch) {
 						const recipeId = idMatch[1];
-						cache.recipes[recipeId] = {
-							data: hit.recipe,
-							expiry: Date.now() + ttl,
-						};
+						cache.recipes.set(recipeId, hit.recipe);
 					}
 				}
 			});
 		}
 	},
+
 	getSearch: (query, options = {}) => {
 		const key = cache.getCacheKey(query, options);
-		const cached = cache.searches[key];
-
-		if (cached && cached.expiry > Date.now()) {
-			console.log('Using cached search results for:', query);
-			return cached.data;
-		}
-
-		return null;
+		return cache.searches.get(key);
 	},
-	cacheRecipe: (id, data, ttl = 60 * 60 * 1000) => {
-		// Cache individual recipes for 1 hour (adjustable)
-		cache.recipes[id] = {
-			data,
-			expiry: Date.now() + ttl,
-		};
+
+	cacheRecipe: (id, data, ttl) => {
+		cache.recipes.set(id, data, ttl);
 	},
+
 	getRecipe: (id) => {
-		const cached = cache.recipes[id];
-
-		if (cached && cached.expiry > Date.now()) {
-			console.log('Using cached recipe:', id);
-			return cached.data;
-		}
-
-		return null;
+		return cache.recipes.get(id);
 	},
 };
 
@@ -235,4 +286,20 @@ export async function getApiUsageStats() {
 		assistantCalls: { current: 0, limit: API_LIMITS.ASSISTANT_CALLS_PER_DAY, percentUsed: 0 },
 		assistantTokens: { current: 0, limit: API_LIMITS.ASSISTANT_TOKENS_PER_DAY, percentUsed: 0 },
 	};
+}
+
+// Clean up resources when module is unloaded (useful for hot module reloading)
+if (typeof window !== 'undefined') {
+	window.addEventListener('beforeunload', () => {
+		if (cache.searches && cache.searches.stop) cache.searches.stop();
+		if (cache.recipes && cache.recipes.stop) cache.recipes.stop();
+	});
+}
+
+// Handle Node.js module unloading
+if (typeof process !== 'undefined' && typeof process.on === 'function') {
+	process.on('SIGTERM', () => {
+		if (cache.searches && cache.searches.stop) cache.searches.stop();
+		if (cache.recipes && cache.recipes.stop) cache.recipes.stop();
+	});
 }

@@ -104,7 +104,7 @@ export default function LoginPage() {
 											name='firstName'
 											type='text'
 											required
-											className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+											className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-600 font-medium'
 											placeholder='First name'
 											value={firstName}
 											onChange={(e) => setFirstName(e.target.value)}
@@ -121,7 +121,7 @@ export default function LoginPage() {
 											name='lastName'
 											type='text'
 											required
-											className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+											className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-600 font-medium'
 											placeholder='Last name'
 											value={lastName}
 											onChange={(e) => setLastName(e.target.value)}
@@ -139,7 +139,7 @@ export default function LoginPage() {
 										id='username'
 										name='username'
 										type='text'
-										className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+										className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-600 font-medium'
 										placeholder='Choose a username'
 										value={username}
 										onChange={(e) => setUsername(e.target.value)}
@@ -159,7 +159,7 @@ export default function LoginPage() {
 								name='email'
 								type='email'
 								required
-								className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+								className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-600 font-medium'
 								placeholder='Email address'
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
@@ -177,7 +177,7 @@ export default function LoginPage() {
 								name='password'
 								type='password'
 								required
-								className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+								className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-600 font-medium'
 								placeholder={
 									isRegisterMode ? 'Create a password (min 6 characters)' : 'Password'
 								}
@@ -198,7 +198,7 @@ export default function LoginPage() {
 									name='confirmPassword'
 									type='password'
 									required
-									className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+									className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-600 font-medium'
 									placeholder='Confirm your password'
 									value={confirmPassword}
 									onChange={(e) => setConfirmPassword(e.target.value)}

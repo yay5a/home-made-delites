@@ -12,6 +12,7 @@ const ApiUsageSchema = new mongoose.Schema(
 			type: String,
 			default: 'global',
 			unique: true,
+			index: true, // Add index for faster lookups
 		},
 
 		// Minute-based tracking

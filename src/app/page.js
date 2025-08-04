@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRecipes } from '@/hooks/useRecipes';
 import RecipeCard from '@/components/recipe/RecipeCard';
-import RecipeAssistant from '@/components/assistant/RecipeAssistant';
+import RecipeAssistantPopup from '@/components/assistant/RecipeAssistantPopup';
 import ApiStatusPage from '@/components/common/ApiStatusPage';
 
 export default function Home() {
@@ -229,22 +229,6 @@ export default function Home() {
 				</div>
 			</section>
 
-			{/* Recipe Assistant Section */}
-			<section className='py-16 bg-blue-50'>
-				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-					<div className='text-center mb-12'>
-						<h2 className='text-3xl font-bold text-gray-900 mb-4'>Recipe Assistant</h2>
-						<p className='text-lg text-gray-600 mb-4'>
-							Need help with a recipe? Ask our AI-powered recipe assistant!
-						</p>
-					</div>
-
-					<div className='max-w-2xl mx-auto'>
-						<RecipeAssistant />
-					</div>
-				</div>
-			</section>
-
 			{/* Features Section */}
 			<section className='bg-white py-16'>
 				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -325,6 +309,9 @@ export default function Home() {
 					</div>
 				</div>
 			</section>
+
+			{/* Recipe Assistant Popup */}
+			<RecipeAssistantPopup />
 		</div>
 	);
 }

@@ -6,13 +6,18 @@ import { GET_RECIPES, SEARCH_RECIPES, GET_RECIPE_BY_ID } from '@/graphql/queries
 import { fetchEdamamRecipes, fetchRecipeById, transformEdamamRecipe } from '@/utils/edamamUtils';
 
 export function useRecipes(options = {}) {
-	const { limit = 10, offset = 0, category } = options;
+	const { limit = 10, category } = options;
 	const [searchQuery, setSearchQuery] = useState('');
 	const [edamamRecipes, setEdamamRecipes] = useState([]);
 	const [edamamLoading, setEdamamLoading] = useState(false);
 	const [nextPageUrl, setNextPageUrl] = useState(null);
 	const [apiError, setApiError] = useState(null);
 	const [hasApiFailure, setHasApiFailure] = useState(false);
+
+	// Cursor-based pagination state
+	const [nextCursor, setNextCursor] = useState(null);
+	const [prevCursor, setRevCursor] = useState(null);
+	const [hasMore, setHasMore] = useState(false);
 
 	// GraphQL query for database recipes
 	const {
@@ -21,8 +26,15 @@ export function useRecipes(options = {}) {
 		error: dbError,
 		refetch: refetchDbRecipes,
 	} = useQuery(GET_RECIPES, {
-		variables: { limit, offset, category },
+		variables: { limit, cursor: null, forward: true, category },
 		errorPolicy: 'all',
+		onCompleted: (data) => {
+			if (data?.recipes?.pageInfo) {
+				setNextCursor(data.recipes.pageInfo.nextCursor);
+				setRevCursor(data.recipes.pageInfo.prevCursor);
+				setHasMore(data.recipes.pageInfo.hasMore);
+			}
+		},
 		onError: (error) => {
 			console.error('GraphQL Error fetching recipes:', error);
 			setApiError(error);
@@ -35,6 +47,13 @@ export function useRecipes(options = {}) {
 		SEARCH_RECIPES,
 		{
 			errorPolicy: 'all',
+			onCompleted: (data) => {
+				if (data?.searchRecipes?.pageInfo) {
+					setNextCursor(data.searchRecipes.pageInfo.nextCursor);
+					setRevCursor(data.searchRecipes.pageInfo.prevCursor);
+					setHasMore(data.searchRecipes.pageInfo.hasMore);
+				}
+			},
 			onError: (error) => {
 				console.error('GraphQL Error searching recipes:', error);
 				setApiError(error);
@@ -90,8 +109,12 @@ export function useRecipes(options = {}) {
 
 	// Combined recipes from both sources
 	const recipes = useMemo(
-		() => [...(dbData?.recipes || []), ...(searchDbData?.searchRecipes || []), ...edamamRecipes],
-		[dbData?.recipes, searchDbData?.searchRecipes, edamamRecipes]
+		() => [
+			...(dbData?.recipes?.recipes || []),
+			...(searchDbData?.searchRecipes?.recipes || []),
+			...edamamRecipes,
+		],
+		[dbData?.recipes?.recipes, searchDbData?.searchRecipes?.recipes, edamamRecipes]
 	);
 
 	const loading = dbLoading || searchDbLoading || edamamLoading;
@@ -108,8 +131,19 @@ export function useRecipes(options = {}) {
 		(query) => {
 			setSearchQuery(query);
 
-			// Search in database first
-			searchDbRecipes({ variables: { query, limit: 5, offset: 0 } });
+			// Reset cursors on new search
+			setNextCursor(null);
+			setRevCursor(null);
+
+			// Search in database first using cursor-based pagination
+			searchDbRecipes({
+				variables: {
+					query,
+					limit: 5,
+					cursor: null, // Start from beginning on new search
+					forward: true, // Forward pagination by default
+				},
+			});
 
 			// Then search external API
 			fetchEdamamRecipesData(query);
@@ -153,6 +187,56 @@ export function useRecipes(options = {}) {
 		[recipes, getRecipeById]
 	);
 
+	// Load more database recipes (next page)
+	const loadMoreDbRecipes = useCallback(() => {
+		if (nextCursor && hasMore) {
+			if (searchQuery) {
+				// If we have a search query, use searchRecipes
+				searchDbRecipes({
+					variables: {
+						query: searchQuery,
+						limit,
+						cursor: nextCursor,
+						forward: true,
+					},
+				});
+			} else {
+				// Otherwise use regular recipe loading
+				refetchDbRecipes({
+					limit,
+					cursor: nextCursor,
+					forward: true,
+					category,
+				});
+			}
+		}
+	}, [nextCursor, hasMore, searchQuery, searchDbRecipes, refetchDbRecipes, limit, category]);
+
+	// Load previous page of database recipes
+	const loadPreviousDbRecipes = useCallback(() => {
+		if (prevCursor) {
+			if (searchQuery) {
+				// If we have a search query, use searchRecipes
+				searchDbRecipes({
+					variables: {
+						query: searchQuery,
+						limit,
+						cursor: prevCursor,
+						forward: false,
+					},
+				});
+			} else {
+				// Otherwise use regular recipe loading
+				refetchDbRecipes({
+					limit,
+					cursor: prevCursor,
+					forward: false,
+					category,
+				});
+			}
+		}
+	}, [prevCursor, searchQuery, searchDbRecipes, refetchDbRecipes, limit, category]);
+
 	return {
 		recipes,
 		loading,
@@ -166,6 +250,13 @@ export function useRecipes(options = {}) {
 		searchRecipes,
 		loadMoreRecipes,
 		refetchDbRecipes,
+
+		// Cursor-based pagination helpers for DB results
+		hasNextDbPage: hasMore,
+		hasPrevDbPage: !!prevCursor,
+		loadMoreDbRecipes,
+		loadPreviousDbRecipes,
+
 		retryApiConnection: () => {
 			setHasApiFailure(false);
 			setApiError(null);

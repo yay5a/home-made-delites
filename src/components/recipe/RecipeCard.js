@@ -1,10 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import RecipeLabels from './RecipeLabels';
+import { layoutStyles, textStyles, spacingStyles, cx } from '@/styles/styleUtils';
 
 export default function RecipeCard({ recipe }) {
 	return (
-		<div className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300'>
+		<div className={cx(layoutStyles.card, layoutStyles.cardHover)}>
 			<div className='relative h-48 w-full'>
 				{recipe.image ? (
 					<Image
@@ -40,8 +41,12 @@ export default function RecipeCard({ recipe }) {
 			</div>
 
 			<div className='p-6'>
-				<h3 className='text-xl font-semibold text-gray-900 mb-2 line-clamp-1'>{recipe.title}</h3>
-				<p className='text-gray-600 text-sm mb-2 line-clamp-2'>{recipe.description}</p>
+				<h3 className={cx(textStyles.h3, spacingStyles.mb2, textStyles.lineClamp1)}>
+					{recipe.title}
+				</h3>
+				<p className={cx(textStyles.bodySm, spacingStyles.mb2, textStyles.lineClamp2)}>
+					{recipe.description}
+				</p>
 
 				{/* Diet, meal type & CO₂ labels */}
 				<RecipeLabels

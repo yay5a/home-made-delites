@@ -1,11 +1,11 @@
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
-import { NextRequest } from 'next/server';
 import { typeDefs } from './schema';
 import { resolvers } from './resolvers';
 import dbConnect from '@/lib/mongoose';
 import jwt from 'jsonwebtoken';
 import User from '@/models/User';
+import logger from '@/utils/logger';
 
 const server = new ApolloServer({
 	typeDefs,
@@ -32,7 +32,7 @@ const createContext = async ({ req }) => {
 				const decoded = jwt.verify(token, process.env.JWT_SECRET);
 				user = await User.findById(decoded.userId);
 			} catch (error) {
-				console.log('Token verification failed:', error.message);
+				logger.warn('Token verification failed', error.message);
 			}
 		}
 
@@ -41,7 +41,7 @@ const createContext = async ({ req }) => {
 			req,
 		};
 	} catch (error) {
-		console.error('Context creation failed:', error);
+		logger.error('Context creation failed', error);
 		throw error;
 	}
 };
@@ -54,7 +54,7 @@ export async function GET(request) {
 	try {
 		return handler(request);
 	} catch (error) {
-		console.error('GraphQL GET error:', error);
+		logger.error('GraphQL GET error', error);
 		return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
 			status: 500,
 			headers: { 'Content-Type': 'application/json' },
@@ -66,7 +66,7 @@ export async function POST(request) {
 	try {
 		return handler(request);
 	} catch (error) {
-		console.error('GraphQL POST error:', error);
+		logger.error('GraphQL POST error', error);
 		return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
 			status: 500,
 			headers: { 'Content-Type': 'application/json' },

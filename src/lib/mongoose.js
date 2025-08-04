@@ -1,5 +1,6 @@
 // Database connection utility
 import mongoose from 'mongoose';
+import logger from '@/utils/logger';
 
 // Prevent Mongoose from being used in the browser
 if (typeof window !== 'undefined') {
@@ -39,11 +40,11 @@ async function dbConnect() {
 		cached.promise = mongoose
 			.connect(MONGODB_URI, opts)
 			.then((mongoose) => {
-				console.log('Connected to MongoDB');
+				logger.info('Connected to MongoDB');
 				return mongoose;
 			})
 			.catch((error) => {
-				console.error('Error connecting to MongoDB:', error);
+				logger.error('Error connecting to MongoDB', error);
 				throw error;
 			});
 	}

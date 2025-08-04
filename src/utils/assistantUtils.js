@@ -1,5 +1,6 @@
 import { trackApiUsage } from './edamamUtils';
 import { ASSISTANT_API_LIMITS } from '@/config/apiLimits';
+import tokenCounter from './tokenCounter';
 
 /**
  * Track Assistant API usage and manage rate limits
@@ -19,13 +20,13 @@ export async function trackAssistantUsage(endpoint, estimatedTokens = 0) {
 
 /**
  * Estimate tokens for a given text string
- * Very rough approximation: ~4 chars per token on average
+ * Uses a more accurate token counting algorithm
  * @param {string} text - Text to estimate tokens for
  * @returns {number} - Estimated token count
  */
 export function estimateTokens(text) {
 	if (!text) return 0;
-	return Math.ceil(text.length / 4);
+	return tokenCounter.countTokens(text);
 }
 
 /**
@@ -36,14 +37,18 @@ export function estimateTokens(text) {
  */
 export async function callAssistantApi(endpoint, payload) {
 	try {
-		// Estimate tokens for this call based on the payload size
-		const payloadString = JSON.stringify(payload);
-		const estimatedTokens = estimateTokens(payloadString);
+		// Estimate tokens for this call based on the prompt
+		const promptTokens = payload.prompt ? estimateTokens(payload.prompt) : 0;
 
-		// Track usage and check limits
-		await trackAssistantUsage(endpoint, estimatedTokens);
+		// For initial quota check, estimate a reasonable upper bound
+		// We'll update with actual values from the response later
+		const initialTokenEstimate = promptTokens * 2; // Conservative initial estimate
+
+		// Track usage and check limits with initial estimate
+		await trackAssistantUsage(endpoint, initialTokenEstimate);
 
 		// Make the API call - replace with your actual assistant API call implementation
+		const payloadString = JSON.stringify(payload);
 		const response = await fetch(`/api/assistant/${endpoint}`, {
 			method: 'POST',
 			headers: {
@@ -56,7 +61,20 @@ export async function callAssistantApi(endpoint, payload) {
 			throw new Error(`Assistant API error: ${response.status}`);
 		}
 
-		return await response.json();
+		const responseData = await response.json();
+
+		// Get actual token counts from the response
+		const { promptTokens: actualPromptTokens, completionTokens } =
+			tokenCounter.getTokenCountsFromResponse(responseData);
+
+		// Update token usage with the actual values minus what we already tracked
+		const additionalTokens = actualPromptTokens + completionTokens - initialTokenEstimate;
+		if (additionalTokens > 0) {
+			// Only track additional usage if our estimate was too low
+			await trackAssistantUsage(endpoint, additionalTokens);
+		}
+
+		return responseData;
 	} catch (error) {
 		console.error('Assistant API call failed:', error);
 		throw error;
@@ -109,10 +127,23 @@ export function getRemainingAssistantQuota() {
  */
 export function canUseAssistant(prompt) {
 	try {
-		// Estimate tokens for the prompt and a potential response
+		// Estimate tokens for the prompt using our accurate token counter
 		const promptTokens = estimateTokens(prompt);
-		// Assume worst-case response is 4x prompt length
-		const estimatedResponseTokens = promptTokens * 4;
+
+		// Use dynamic ratio based on prompt length - shorter prompts tend to have
+		// relatively longer responses, while longer prompts have more concise responses
+		let responseRatio;
+		if (promptTokens <= 10) {
+			responseRatio = 6; // Very short prompts often get longer responses
+		} else if (promptTokens <= 50) {
+			responseRatio = 4; // Short prompts
+		} else if (promptTokens <= 200) {
+			responseRatio = 3; // Medium length prompts
+		} else {
+			responseRatio = 2; // Long prompts tend to get more concise responses
+		}
+
+		const estimatedResponseTokens = promptTokens * responseRatio;
 		const totalEstimatedTokens = promptTokens + estimatedResponseTokens;
 
 		const quota = getRemainingAssistantQuota();

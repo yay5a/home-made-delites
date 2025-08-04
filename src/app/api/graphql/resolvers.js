@@ -26,13 +26,49 @@ export const resolvers = {
 			return user;
 		},
 
-		recipes: async (_, { limit = 10, offset = 0, category }) => {
-			const query = category ? { category } : {};
-			return await Recipe.find(query)
-				.populate('author')
-				.sort({ createdAt: -1 })
-				.skip(offset)
-				.limit(limit);
+		recipes: async (_, { limit = 10, cursor = null, forward = true, category }) => {
+			// Import the searchRecipes function
+			const { searchRecipes } = await import('@/lib/recipeDb.server');
+
+			// Use the criteria to filter by category if needed
+			const criteria = category ? { category } : {};
+
+			// Call our cursor-based pagination function
+			const result = await searchRecipes(criteria, limit, cursor, forward);
+
+			// Populate author information for each recipe
+			if (result.recipes && result.recipes.length > 0) {
+				const User = (await import('@/models/User')).default;
+
+				// Get all author IDs
+				const authorIds = result.recipes.map((recipe) => recipe.createdBy).filter(Boolean);
+
+				// Fetch all authors in one query
+				const authors = await User.find({ _id: { $in: authorIds } });
+				const authorsMap = new Map(authors.map((author) => [author._id.toString(), author]));
+
+				// Map authors to recipes
+				result.recipes = result.recipes.map((recipe) => {
+					if (recipe.createdBy) {
+						const authorId = recipe.createdBy.toString();
+						const author = authorsMap.get(authorId);
+						if (author) {
+							return { ...recipe, author };
+						}
+					}
+					return recipe;
+				});
+			}
+
+			return {
+				recipes: result.recipes,
+				pageInfo: {
+					hasMore: result.pagination.hasMore,
+					nextCursor: result.pagination.nextCursor,
+					prevCursor: result.pagination.prevCursor,
+					totalResults: result.pagination.totalResults,
+				},
+			};
 		},
 
 		recipe: async (_, { id }) => {
@@ -45,25 +81,94 @@ export const resolvers = {
 			return recipe;
 		},
 
-		searchRecipes: async (_, { query, limit = 10, offset = 0 }) => {
-			const searchQuery = {
-				$or: [
-					{ title: { $regex: query, $options: 'i' } },
-					{ description: { $regex: query, $options: 'i' } },
-					{ ingredients: { $regex: query, $options: 'i' } },
-					{ category: { $regex: query, $options: 'i' } },
-				],
-			};
+		searchRecipes: async (_, { query, limit = 10, cursor = null, forward = true }) => {
+			// Import the searchRecipes function
+			const { searchRecipes } = await import('@/lib/recipeDb.server');
 
-			return await Recipe.find(searchQuery)
-				.populate('author')
-				.sort({ createdAt: -1 })
-				.skip(offset)
-				.limit(limit);
+			// Use $text search for efficient full-text queries
+			const criteria = { query, useTextSearch: true };
+
+			// Call our cursor-based pagination function
+			const result = await searchRecipes(criteria, limit, cursor, forward);
+
+			// Populate author information for each recipe
+			if (result.recipes && result.recipes.length > 0) {
+				const User = (await import('@/models/User')).default;
+
+				// Get all author IDs
+				const authorIds = result.recipes.map((recipe) => recipe.createdBy).filter(Boolean);
+
+				// Fetch all authors in one query
+				const authors = await User.find({ _id: { $in: authorIds } });
+				const authorsMap = new Map(authors.map((author) => [author._id.toString(), author]));
+
+				// Map authors to recipes
+				result.recipes = result.recipes.map((recipe) => {
+					if (recipe.createdBy) {
+						const authorId = recipe.createdBy.toString();
+						const author = authorsMap.get(authorId);
+						if (author) {
+							return { ...recipe, author };
+						}
+					}
+					return recipe;
+				});
+			}
+
+			return {
+				recipes: result.recipes,
+				pageInfo: {
+					hasMore: result.pagination.hasMore,
+					nextCursor: result.pagination.nextCursor,
+					prevCursor: result.pagination.prevCursor,
+					totalResults: result.pagination.totalResults,
+				},
+			};
 		},
 
-		userRecipes: async (_, { userId }) => {
-			return await Recipe.find({ author: userId }).populate('author').sort({ createdAt: -1 });
+		userRecipes: async (
+			_,
+			{ userId, type = 'created', limit = 10, cursor = null, forward = true }
+		) => {
+			// Import the getUserRecipes function
+			const { getUserRecipes } = await import('@/lib/recipeDb.server');
+
+			// Call our cursor-based pagination function
+			const result = await getUserRecipes(userId, type, limit, cursor, forward);
+
+			// Populate author information for each recipe
+			if (result.recipes && result.recipes.length > 0) {
+				const User = (await import('@/models/User')).default;
+
+				// Get all author IDs
+				const authorIds = result.recipes.map((recipe) => recipe.createdBy).filter(Boolean);
+
+				// Fetch all authors in one query
+				const authors = await User.find({ _id: { $in: authorIds } });
+				const authorsMap = new Map(authors.map((author) => [author._id.toString(), author]));
+
+				// Map authors to recipes
+				result.recipes = result.recipes.map((recipe) => {
+					if (recipe.createdBy) {
+						const authorId = recipe.createdBy.toString();
+						const author = authorsMap.get(authorId);
+						if (author) {
+							return { ...recipe, author };
+						}
+					}
+					return recipe;
+				});
+			}
+
+			return {
+				recipes: result.recipes,
+				pageInfo: {
+					hasMore: result.pagination.hasMore,
+					nextCursor: result.pagination.nextCursor,
+					prevCursor: result.pagination.prevCursor,
+					totalResults: result.pagination.totalResults,
+				},
+			};
 		},
 	},
 
