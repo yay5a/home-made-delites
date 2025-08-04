@@ -1,5 +1,6 @@
 import ApiUsage from '../models/ApiUsage';
 import dbConnect from '../lib/mongoose';
+import { API_LIMITS } from '@/config/apiLimits';
 
 /**
  * Class for tracking and managing API usage
@@ -10,12 +11,7 @@ export class ApiUsageTracker {
 	 */
 	constructor() {
 		// API Rate Limits
-		this.API_LIMITS = {
-			HITS_PER_MINUTE: 10,
-			HITS_PER_MONTH: 10000,
-			ASSISTANT_CALLS_PER_DAY: 30,
-			ASSISTANT_TOKENS_PER_DAY: 10000,
-		};
+		this.API_LIMITS = API_LIMITS;
 	}
 
 	/**

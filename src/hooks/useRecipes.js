@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_RECIPES, SEARCH_RECIPES, GET_RECIPE_BY_ID } from '@/graphql/queries';
-import { fetchEdamamRecipes, transformEdamamRecipe } from '@/utils/edamamUtils';
+import { fetchEdamamRecipes, fetchRecipeById, transformEdamamRecipe } from '@/utils/edamamUtils';
 
 // Fallback recipes in case API fails
 const fallbackRecipes = [

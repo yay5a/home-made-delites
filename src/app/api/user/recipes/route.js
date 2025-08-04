@@ -1,7 +1,7 @@
 // API route for user recipe interactions (likes, saves)
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
-import { saveRecipeInteraction, getUserRecipes } from '@/lib/recipeDb.server';
+import { saveRecipeInteraction, getUserRecipes } from '@/lib/recipeFetcher.server';
 import { verifyToken } from '@/lib/authService';
 
 export async function GET(request) {

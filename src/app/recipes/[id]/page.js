@@ -5,6 +5,7 @@ import { useRecipes } from '@/hooks/useRecipes';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import RecipeLabels from '@/components/recipe/RecipeLabels';
 
 export default function RecipeDetailPage() {
 	const params = useParams();
@@ -70,32 +71,16 @@ export default function RecipeDetailPage() {
 					</div>
 				)}
 
-				{/* Diet and Health Labels */}
-				{(recipe.dietLabels?.length > 0 || recipe.healthLabels?.length > 0) && (
-					<div className='mb-6'>
-						<div className='flex flex-wrap gap-2'>
-							{recipe.dietLabels?.map((label, index) => (
-								<span
-									key={`diet-${index}`}
-									className='bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium'>
-									{label}
-								</span>
-							))}
-							{recipe.healthLabels?.slice(0, 5).map((label, index) => (
-								<span
-									key={`health-${index}`}
-									className='bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium'>
-									{label}
-								</span>
-							))}
-							{recipe.healthLabels?.length > 5 && (
-								<span className='bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium'>
-									+{recipe.healthLabels.length - 5} more
-								</span>
-							)}
-						</div>
-					</div>
-				)}
+				{/* Diet, health & CO₂ labels */}
+				<RecipeLabels
+					labels={{
+						dietLabels: recipe.dietLabels || [],
+						healthLabels: recipe.healthLabels || [],
+						mealType: recipe.mealType || [],
+						co2EmissionsClass: recipe.co2EmissionsClass,
+					}}
+					className='mb-3 gap-2'
+				/>
 			</div>
 
 			<div className='grid md:grid-cols-2 gap-8'>

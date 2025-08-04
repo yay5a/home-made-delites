@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import RecipeLabels from './RecipeLabels';
 
 export default function RecipeCard({ recipe }) {
 	return (
@@ -42,42 +43,15 @@ export default function RecipeCard({ recipe }) {
 				<h3 className='text-xl font-semibold text-gray-900 mb-2 line-clamp-1'>{recipe.title}</h3>
 				<p className='text-gray-600 text-sm mb-2 line-clamp-2'>{recipe.description}</p>
 
-				{/* Diet labels & meal type */}
-				<div className='mb-3 flex flex-wrap gap-1'>
-					{recipe.dietLabels &&
-						recipe.dietLabels.length > 0 &&
-						recipe.dietLabels.slice(0, 2).map((label, index) => (
-							<span
-								key={`diet-${index}`}
-								className='bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full'>
-								{label}
-							</span>
-						))}
-
-					{recipe.mealType &&
-						recipe.mealType.length > 0 &&
-						recipe.mealType.slice(0, 1).map((type, index) => (
-							<span
-								key={`meal-${index}`}
-								className='bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full'>
-								{type}
-							</span>
-						))}
-
-					{recipe.co2EmissionsClass && (
-						<span
-							className={`text-xs px-2 py-0.5 rounded-full ${
-								recipe.co2EmissionsClass === 'A+' || recipe.co2EmissionsClass === 'A'
-									? 'bg-green-100 text-green-800'
-									: recipe.co2EmissionsClass === 'B' ||
-									  recipe.co2EmissionsClass === 'C'
-									? 'bg-yellow-100 text-yellow-800'
-									: 'bg-red-100 text-red-800'
-							}`}>
-							CO₂ {recipe.co2EmissionsClass}
-						</span>
-					)}
-				</div>
+				{/* Diet, meal type & CO₂ labels */}
+				<RecipeLabels
+					labels={{
+						dietLabels: recipe.dietLabels?.slice(0, 2) || [],
+						mealType: recipe.mealType?.slice(0, 1) || [],
+						co2EmissionsClass: recipe.co2EmissionsClass,
+					}}
+					className='mb-3 gap-1'
+				/>
 
 				<div className='flex items-center justify-between text-sm text-gray-500 mb-4'>
 					{/* Show calories if available */}

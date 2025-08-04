@@ -37,7 +37,7 @@ The following Mongoose models have been created:
     - Connection caching to prevent multiple connections
     - Environment-based configuration
 
-2. **Recipe Database Utils** - `/src/lib/recipeDbUtils.js`
+2. **Recipe Database Utils** - `/src/lib/recipeDb.server.js`
 
     - CRUD operations for recipes
     - Search functionality with filtering and pagination

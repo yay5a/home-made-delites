@@ -3,6 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { redirect } from 'next/navigation';
+import apiUsageToday from '@/mock/api-usage-today.json';
+import apiUsageWeek from '@/mock/api-usage-week.json';
+import apiUsageMonth from '@/mock/api-usage-month.json';
+
+const mockDataMap = {
+	today: apiUsageToday,
+	week: apiUsageWeek,
+	month: apiUsageMonth,
+};
 
 export default function ApiUsageDashboard() {
 	const { isAuthenticated, isLoading, user } = useAuth();
@@ -37,79 +46,8 @@ export default function ApiUsageDashboard() {
 			// Simulate API call delay
 			await new Promise((resolve) => setTimeout(resolve, 800));
 
-			// Mock data based on selected timeframe
-			let mockData;
-
-			switch (period) {
-				case 'today':
-					mockData = {
-						recipeApiCalls: {
-							total: 237,
-							limit: 500,
-							byEndpoint: {
-								search: 183,
-								getById: 54,
-							},
-						},
-						assistantApiCalls: {
-							total: 18,
-							limit: 30,
-							totalTokens: 4235,
-							tokenLimit: 10000,
-						},
-						uniqueUsers: 42,
-						peakHour: '14:00-15:00',
-					};
-					break;
-				case 'week':
-					mockData = {
-						recipeApiCalls: {
-							total: 1423,
-							limit: 3500,
-							byEndpoint: {
-								search: 1102,
-								getById: 321,
-							},
-							byDay: [203, 187, 252, 308, 275, 198],
-						},
-						assistantApiCalls: {
-							total: 97,
-							limit: 210,
-							totalTokens: 24680,
-							tokenLimit: 70000,
-							byDay: [12, 15, 18, 22, 17, 13],
-						},
-						uniqueUsers: 138,
-						peakDay: 'Thursday',
-					};
-					break;
-				case 'month':
-					mockData = {
-						recipeApiCalls: {
-							total: 5827,
-							limit: 10000,
-							byEndpoint: {
-								search: 4521,
-								getById: 1306,
-							},
-							byWeek: [1423, 1587, 1368, 1449],
-						},
-						assistantApiCalls: {
-							total: 312,
-							limit: 900,
-							totalTokens: 78250,
-							tokenLimit: 300000,
-							byWeek: [97, 85, 72, 58],
-						},
-						uniqueUsers: 327,
-						peakWeek: 'Week 2',
-					};
-					break;
-				default:
-					mockData = { error: 'Invalid timeframe' };
-			}
-
-			setUsageData(mockData);
+			const data = mockDataMap[period];
+			setUsageData(data || { error: 'Invalid timeframe' });
 		} catch (error) {
 			console.error('Failed to fetch API usage data:', error);
 		} finally {

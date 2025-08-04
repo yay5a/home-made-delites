@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import ApiUsage from '@/models/ApiUsage';
 import dbConnect from '@/lib/mongoose';
 import { verifyToken } from '@/lib/authService';
-import { API_LIMITS } from '@/utils/edamamUtils';
+import { API_LIMITS } from '@/config/apiLimits';
 
 /**
  * API endpoint to retrieve API usage statistics

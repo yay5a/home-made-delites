@@ -55,27 +55,28 @@ function authReducer(state, action) {
 export function AuthProvider({ children }) {
 	const [state, dispatch] = useReducer(authReducer, initialState);
 
-	// GraphQL mutations
-	const [loginMutation] = useMutation(LOGIN_MUTATION, {
-		onCompleted: (data) => {
-			const { token, user } = data.login;
+	const handleAuthSuccess = (data) => {
+		const authData = data.login || data.register;
+		if (authData) {
+			const { token, user } = authData;
 			localStorage.setItem('token', token);
 			dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-		},
-		onError: (error) => {
-			dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
-		},
+		}
+	};
+
+	const handleAuthError = (error) => {
+		dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
+	};
+
+	// GraphQL mutations
+	const [loginMutation] = useMutation(LOGIN_MUTATION, {
+		onCompleted: handleAuthSuccess,
+		onError: handleAuthError,
 	});
 
 	const [registerMutation] = useMutation(REGISTER_MUTATION, {
-		onCompleted: (data) => {
-			const { token, user } = data.register;
-			localStorage.setItem('token', token);
-			dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-		},
-		onError: (error) => {
-			dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
-		},
+		onCompleted: handleAuthSuccess,
+		onError: handleAuthError,
 	});
 
 	// Query for current user profile

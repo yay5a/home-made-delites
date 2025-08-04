@@ -1,10 +1,5 @@
 import { trackApiUsage } from './edamamUtils';
-
-// Constants for API limits
-const ASSISTANT_API_LIMITS = {
-	CALLS_PER_DAY: 30,
-	TOKENS_PER_DAY: 10000,
-};
+import { ASSISTANT_API_LIMITS } from '@/config/apiLimits';
 
 /**
  * Track Assistant API usage and manage rate limits

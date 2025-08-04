@@ -1,0 +1,20 @@
+{
+	"recipeApiCalls": {
+		"total": 1423,
+		"limit": 3500,
+		"byEndpoint": {
+			"search": 1102,
+			"getById": 321
+		},
+		"byDay": [203, 187, 252, 300, 275, 190]
+	},
+	"assistantApiCalls": {
+		"total": 97,
+		"limit": 210,
+		"totalTokens": 24680,
+		"tokenLimit": 70000,
+		"byDay": [12, 15, 18, 22, 17, 13]
+	},
+	"uniqueUsers": 138,
+	"peakDay": "Thursday"
+}

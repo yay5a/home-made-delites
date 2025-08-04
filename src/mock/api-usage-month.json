@@ -1,0 +1,20 @@
+{
+	"recipeApiCalls": {
+		"total": 5827,
+		"limit": 10000,
+		"byEndpoint": {
+			"search": 4521,
+			"getById": 1306
+		},
+		"byWeek": [1423, 1587, 1368, 1449]
+	},
+	"assistantApiCalls": {
+		"total": 312,
+		"limit": 900,
+		"totalTokens": 78250,
+		"tokenLimit": 300000,
+		"byWeek": [97, 85, 72, 58]
+	},
+	"uniqueUsers": 327,
+	"peakWeek": "Week 2"
+}

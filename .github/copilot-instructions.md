@@ -73,6 +73,21 @@ This document guides AI assistants on key aspects of the Home Made Delites recip
 
 ## Common Patterns and Examples
 
+## BEFORE ADDING NEW CODE, PLEASE REVIEW THE FOLLOWING GUIDELINES:
+
+-   REVIEW THE EXISTING CODEBASE FOR REDUNDANCY AND SIMILAR FUNCTIONALITY AND
+    AVOID DUPLICATION.
+-   REMOVE UNNECESSARY CODE AND FILES.
+-   KEEP DRY (Don't Repeat Yourself) PRINCIPLES IN MIND.
+-   DO NOT REINVENT THE WHEEL; USE EXISTING UTILITIES AND COMPONENTS WHEREVER POSSIBLE BY LOOKING AT THE FILES IN THE `src` DIRECTORY.
+-   AFTER ADDING NEW CODE, ANALYZE THE CHANGES TO ENSURE THEY REDUCE DUPLICATION AND IMPROVE THE CODEBASE.
+-   Ensure code follows existing patterns and conventions
+-   Use existing GraphQL queries and mutations where possible
+-   Follow the component structure and naming conventions
+-   Use the provided authentication and authorization patterns
+-   Ensure all new code is tested and documented
+-   Use the provided utility functions for API interactions
+
 1. **Adding a New Page/Route**:
 
     - Create new directory in `/src/app/{route}`
