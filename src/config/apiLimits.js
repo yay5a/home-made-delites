@@ -1,4 +1,0 @@
-export const API_LIMITS = {
-	HITS_PER_MINUTE: 10,
-	HITS_PER_MONTH: 10000,
-};
