@@ -1,17 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { AuthContext } from '@/context/AuthContext';
+import { useRecipeSearch } from '@/hooks/useRecipeSearch';
 import RecipeCard from './RecipeCard';
 
 export default function SearchModal() {
+	const { user } = useContext(AuthContext);
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
-	const [results, setResults] = useState([]);
+	const { results, loading, errorMsg, clickLeft, serverLeft, search } = useRecipeSearch();
 
-	async function doSearch(query) {
-		e.preventDefault();
-		if (query.trim()) {
-			searchRecipes(query);
-		}
+	function onSubmit(event) {
+		event.preventDefault();
+		if (!user) return 'Please login/register to search for recipes!';
+		search(query);
 	}
+
+	return (
+		<>
+			<button>Search</button>
+			{open && (
+				<div>
+					<button>
+						<form action=''>
+							<input
+								type='text'
+								value={query}
+								onChange={(event) => setQuery(event.target.value)}
+							/>
+						</form>
+					</button>
+				</div>
+			)}
+		</>
+	);
 }
