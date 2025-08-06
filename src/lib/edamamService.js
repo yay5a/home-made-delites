@@ -1,19 +1,17 @@
 export default async function fetchRecipes(query) {
-	const url = `/api/recipes?search=${encodeURIComponent(query)}`;
-	const res = await fetch(url);
+	const isServer = typeof window === 'undefined';
+	const base = isServer ? process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' : '';
 
-	// Rate-limit exceeded
+	const url = `${base}/api/edamam?search=${encodeURIComponent(query)}`;
+	const res = await fetch(url);
 	if (res.status === 429) {
 		const err = new Error('Rate limit exceeded — please wait a moment.');
 		err.code = 429;
 		throw err;
 	}
-
-	// Other fetch errors
 	if (!res.ok) {
 		throw new Error(`Search request failed: ${res.status} ${res.statusText}`);
 	}
-
-	const json = await res.json();
-	return json.results;
+	const { results } = await res.json();
+	return results;
 }

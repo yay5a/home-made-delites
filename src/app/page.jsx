@@ -1,8 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
 import SearchModal from '@/components/SearchModal';
+import RecipeCard from '@/components/RecipeCard';
 
-export default function Home() {
+export default async function Home() {
+	let recipes = [];
+	const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+	const res = await fetch(`${base}/api/edamam?search=chicken`);
+	if (res.ok) {
+		const json = res.json();
+		recipes = json.results ?? [];
+	}
 	return (
 		<div className='font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20'>
 			<main className='flex flex-col gap-[32px] row-start-2 items-center sm:items-start'>
@@ -24,6 +32,16 @@ export default function Home() {
 					</li>
 					<li className='tracking-[-.01em]'>Save and see your changes instantly.</li>
 				</ol>
+				{/* Interactive search trigger + modal */}
+				<SearchModal />
+
+				{/* Display featured recipes */}
+				<h2 className='mb-4 text-2xl font-semibold'>Featured Recipes</h2>
+				<div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+					{recipes.map((r) => (
+						<RecipeCard key={r.id} recipe={r} />
+					))}
+				</div>
 				<div className='flex flex-col items-center gap-4 sm:flex-row'>
 					<a
 						className='rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto'
