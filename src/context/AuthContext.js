@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import jwtDecode from 'jwt-decode';
 
 export const AuthContext = createContext();
 
@@ -6,20 +7,32 @@ export const AuthProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 	const [token, setToken] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
 
 	useEffect(() => {
-		const storedToken = localStorage.getItem('token');
+	const storedToken = localStorage.getItem('token');
+
 		if (storedToken) {
 			setToken(storedToken);
-			fetchUser(storedToken);
+			fetchUser(storedToken)
+			.then(() => {
+        if (isMounted) setLoading(false);
+      })
+      .catch(() => {
+        if (isMounted) setLoading(false);
+	  }(.)
 		} else {
 			setLoading(false);
+		}
+
+		return () => {
+			isMounted = false;
 		}
 	}, []);
 
 	const fetchUser = async (jwt) => {
 		try {
-			const res = await fetch('/api/me', {
+			const res = await fetch('/api/user', {
 				headers: { Authorization: `Bearer ${jwt}` }
 			});
 			if (res.ok) {
