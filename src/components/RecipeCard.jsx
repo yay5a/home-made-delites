@@ -1,9 +1,19 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { fetchRecipes } from '@/lib/edamamService'
 
-export default async function RecipeCard({ recipe }) {
-	const { id, title, image, dietLabels = [], mealType = [], calories, link } = recipe;
+export default function RecipeCard({ recipe }) {
+    let fetchRecipes = recipe
+    recipe = {
+    uri: id,
+    label: title,
+    image,
+    dietLabels = [],
+    mealType = [],
+    calories,
+    url: link
+  };
 
 	return (
 		<article className='overflow-hidden transition-shadow bg-white rounded-lg shadow hover:shadow-lg'>

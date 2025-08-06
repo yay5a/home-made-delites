@@ -1,97 +1,105 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import SearchModal from '@/components/SearchModal';
 import RecipeCard from '@/components/RecipeCard';
 
-export default async function Home() {
-	let recipes = [];
-	const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-	const res = await fetch(`${base}/api/edamam?search=chicken`);
-	if (res.ok) {
-		const json = res.json();
-		recipes = json.results ?? [];
-	}
-	return (
-		<div className='font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20'>
-			<main className='flex flex-col gap-[32px] row-start-2 items-center sm:items-start'>
-				<Image
-					className='dark:invert'
-					src='/logos/next.svg'
-					alt='Next.js logo'
-					width={180}
-					height={38}
-					priority
-				/>
-				<ol className='font-mono text-center list-decimal list-inside text-sm/6 sm:text-left'>
-					<li className='mb-2 tracking-[-.01em]'>
-						Get started by editing{' '}
-						<code className='bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded'>
-							src/app/page.js
-						</code>
-						.
-					</li>
-					<li className='tracking-[-.01em]'>Save and see your changes instantly.</li>
-				</ol>
-				{/* Interactive search trigger + modal */}
-				<SearchModal />
 
-				{/* Display featured recipes */}
-				<h2 className='mb-4 text-2xl font-semibold'>Featured Recipes</h2>
-				<div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-					{recipes.map((r) => (
-						<RecipeCard key={r.id} recipe={r} />
-					))}
+export default function Home() {
+	return (
+		<div className="min-h-screen">
+			{/* Hero Section */}
+			<section>
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+					<div className="text-center">
+						<h1>
+							Welcome to <span className="text-blue-600">Home Made Delites</span>
+						</h1>
+						<p>
+							Discover, create, and share delicious homemade recipes with our community of
+							passionate home cooks. From family classics to innovative creations, find
+							your next favorite dish here.
+						</p>
+						<div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+							<Link
+								href="/recipes"
+								className="bg-blue-600 px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+							>
+								Browse Recipes
+							</Link>
+							<Link
+								href="/login"
+								className="border border-blue-600 px-8 py-3 rounded-lg hover:bg-blue-50 transition-colors"
+							>
+								Join Our Community
+							</Link>
+						</div>
+					</div>
 				</div>
-				<div className='flex flex-col items-center gap-4 sm:flex-row'>
-					<a
-						className='rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto'
-						href='https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-						target='_blank'
-						rel='noopener noreferrer'>
-						<Image
-							className='dark:invert'
-							src='/logos/vercel.svg'
-							alt='Vercel logomark'
-							width={20}
-							height={20}
-						/>
-						Deploy now
-					</a>
-					<a
-						className='rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]'
-						href='https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-						target='_blank'
-						rel='noopener noreferrer'>
-						Read our docs
-					</a>
+			</section>
+
+			{/* Search Modal */}
+			<div className="flex justify-center ">
+				<div className="w-full max-w-md">
+					<SearchModal />
 				</div>
-			</main>
-			<footer className='row-start-3 flex gap-[24px] flex-wrap items-center justify-center'>
-				<a
-					className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-					href='https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-					target='_blank'
-					rel='noopener noreferrer'>
-					<Image aria-hidden src='/logos/file.svg' alt='File icon' width={16} height={16} />
-					Learn
-				</a>
-				<a
-					className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-					href='https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-					target='_blank'
-					rel='noopener noreferrer'>
-					<Image aria-hidden src='/logos/window.svg' alt='Window icon' width={16} height={16} />
-					Examples
-				</a>
-				<a
-					className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-					href='https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-					target='_blank'
-					rel='noopener noreferrer'>
-					<Image aria-hidden src='/logos/globe.svg' alt='Globe icon' width={16} height={16} />
-					Go to nextjs.org →
-				</a>
-			</footer>
+			</div>
+
+			{/* Featured Recipes Section */}
+			<section className="py-16">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="text-center mb-12">
+						<h2>Featured Recipes</h2>
+						<p>
+							Check out some of our most popular and loved recipes
+						</p>
+					</div>
+                    <RecipeCard />
+					<div className="text-center mt-8">
+						<Link
+							href="/recipes"
+							className="inline-block bg-gray-900 px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+						>
+							View All Recipes
+						</Link>
+					</div>
+				</div>
+			</section>
+
+			{/* Features Section */}
+			<section className="bg-white py-16">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="text-center mb-12">
+						<h2>Why Choose Home Made Delites?</h2>
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+						<div className="bg-gray-100 rounded-xl shadow border border-gray-200 p-8 flex flex-col items-center">
+							<div className="rounded-full bg-blue-100 p-4 mb-4">
+								<svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" className="text-blue-500" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 15l4-4 4 4"/></svg>
+							</div>
+							<p>
+								Handpicked recipes from passionate home cooks.
+							</p>
+						</div>
+						<div className="bg-gray-100 rounded-xl shadow border border-gray-200 p-8 flex flex-col items-center">
+							<div className="rounded-full bg-pink-100 p-4 mb-4">
+								<svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" className="text-pink-500" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+							</div>
+							<p>
+								Simple tools to save, share, and organize your favorites.
+							</p>
+						</div>
+						<div className="bg-gray-100 rounded-xl shadow border border-gray-200 p-8 flex flex-col items-center">
+							<div className="rounded-full bg-green-100 p-4 mb-4">
+								<svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-500" viewBox="0 0 24 24"><path d="M9 17v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"/><path d="M12 22v-4"/><circle cx="12" cy="7" r="2"/></svg>
+							</div>
+							<p>
+								Modern, responsive design for every device.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
 		</div>
 	);
 }

@@ -6,7 +6,7 @@ import { useRecipeSearch } from '@/hooks/useRecipeSearch';
 import RecipeCard from './RecipeCard';
 
 export default function SearchModal() {
-	// const { user } = useContext(AuthContext);
+//     const { user } = useContext(AuthContext);
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const { results, loading, errorMsg, clickLeft, serverLeft, search } = useRecipeSearch();
@@ -39,7 +39,7 @@ export default function SearchModal() {
 
 					<div>
 						{results.map((result) => (
-							<RecipeCard key={result.id} recipe={result} />
+							<RecipeCard key={result.uri} recipe={result} />
 						))}
 					</div>
 				</div>

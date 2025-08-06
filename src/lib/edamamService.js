@@ -12,6 +12,14 @@ export default async function fetchRecipes(query) {
 	if (!res.ok) {
 		throw new Error(`Search request failed: ${res.status} ${res.statusText}`);
 	}
-	const { results } = await res.json();
-	return results;
+    const { results } = await res.json();
+  return results.map(r => ({
+    id: uri,
+    title: label,
+    image: image,
+    dietLabels: dietLabels,
+    mealType: mealType,
+    calories: calories,
+    link: url,
+  }));
 }
