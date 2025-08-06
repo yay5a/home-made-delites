@@ -4,7 +4,7 @@
 ![Next.js Version](https://img.shields.io/badge/next.js-15.4.5-blueviolet)
 ![React Version](https://img.shields.io/badge/react-19.1.0-blue)
 
-A modern recipe sharing web application built with Next.js and GraphQL where food enthusiasts can discover, share, and save their favorite homemade recipes.
+A modern recipe sharing web application built with Next.js and Mongoose where food enthusiasts can discover, share, and save their favorite homemade recipes.
 
 ## 🚀 Features
 
@@ -12,7 +12,6 @@ A modern recipe sharing web application built with Next.js and GraphQL where foo
 -   **Recipe Discovery**: Browse and search for recipes by category, ingredients, or popularity
 -   **Personal Profiles**: User dashboards with saved recipes and cooking history
 -   **Responsive Design**: Optimized for desktop and mobile devices
--   **GraphQL API**: Efficient data fetching and mutations
 
 ## 📋 Prerequisites
 
@@ -55,7 +54,6 @@ npm run dev
 
 -   **Framework**: [Next.js](https://nextjs.org/)
 -   **Frontend**: React, Tailwind CSS
--   **API**: GraphQL with Apollo Server
 -   **Authentication**: JWT with bcrypt
 -   **Database**: MongoDB with Mongoose
 -   **Styling**: Tailwind CSS
@@ -70,24 +68,6 @@ npm run dev
 ## 🧪 Testing
 
 Testing framework and guidelines will be added in future updates.
-
-## 📝 API Documentation
-
-The GraphQL API provides the following main operations:
-
-### Queries
-
--   `getRecipes`: Fetch all recipes with optional filtering
--   `getRecipeById`: Get detailed information about a specific recipe
--   `getUserProfile`: Get user profile information
-
-### Mutations
-
--   `createUser`: Register a new user
--   `loginUser`: Authenticate a user
--   `createRecipe`: Add a new recipe
--   `updateRecipe`: Modify an existing recipe
--   `deleteRecipe`: Remove a recipe
 
 ## 🤝 Contributing
 
