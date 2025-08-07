@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export default function Footer() {
     return (
-        <footer className="footer-cozy text-stone-800 pt-10 pb-6 border-t-4 border-dotted border-amber-300">
+        <footer className="bg-amber-50 text-stone-800 pt-10 pb-6 border-t-4 border-dotted border-amber-300">
             <div className="container mx-auto grid gap-8 md:grid-cols-12">
                 {/* Brand + Social */}
                 <div className="md:col-span-4 space-y-4">
@@ -41,10 +41,10 @@ export default function Footer() {
                             { href: '#', text: 'Privacy Policy' },
                             { href: '#', text: 'Terms of Service' },
                         ].map(({ href, text }) => (
-                                <li key={text}>
-                                    <FooterLink href={href}>{text}</FooterLink>
-                                </li>
-                            ))}
+                            <li key={text}>
+                                <FooterLink href={href}>{text}</FooterLink>
+                            </li>
+                        ))}
                     </ul>
                 </div>
 
@@ -74,4 +74,3 @@ function SocialIcon({ href, label, children }) {
         </Link>
     );
 }
-

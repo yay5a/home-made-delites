@@ -9,11 +9,11 @@ import { Patrick_Hand } from 'next/font/google';
 const patrick = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 export default function RecipeCard({ recipe }) {
-    if (!recipe) return null;   
+    if (!recipe) return null;
     const {
         cuisineType = [],
         dietLabels = [],
-        mealType   = [],
+        mealType = [],
     } = recipe;
 
     const tags = [...cuisineType, ...dietLabels, ...mealType];
@@ -22,46 +22,46 @@ export default function RecipeCard({ recipe }) {
 
     return (
         <>
-            <article className="p-4 space-y-2 bg-[url('/images/paper-texture.svg')] bg-repeat border border-amber-200 rounded-lg shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
+            <article className="p-6 space-y-4 bg-amber-50 border border-amber-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
                 <Link
                     href={recipe.url}
-                    className="py-4 text-center font-semibold focus:ring"
+                    className="block py-2 text-center font-bold text-amber-800 text-xl md:text-2xl tracking-wide focus:outline-none focus:ring-2 focus:ring-amber-400 rounded"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <h3 className={`${patrick.className} text-2xl`}>{recipe.label}</h3>
+                    <h3 className={`${patrick.className} text-2xl mb-2`}>{recipe.label}</h3>
                 </Link>
                 {recipe.image ? (
-                        <Image
-                            placeholder="blur"
-                            blurDataURL={recipe.image + '?w=10&q=10'}
-                            src={recipe.image}
-                            alt={'Photo of ' + recipe.label}
-                            width={300}
-                            height={200}
-                            className="object-contain mx-auto mb-4 rounded"
-                        />
+                    <Image
+                        placeholder="blur"
+                        blurDataURL={recipe.image + '?w=10&q=10'}
+                        src={recipe.image}
+                        alt={'Photo of ' + recipe.label}
+                        width={300}
+                        height={200}
+                        className="object-contain mx-auto mb-4 rounded-lg shadow"
+                    />
                 ) : (
-                        <div className="flex items-center justify-center">
-                            <XMarkIcon className="w-12 h-12 " />
-                        </div>
-                    )}
+                    <div className="flex items-center justify-center h-48 bg-gray-100 rounded-lg">
+                        <XMarkIcon className="w-12 h-12 text-gray-400" />
+                    </div>
+                )}
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 justify-center">
                     {shown.map((tag, i) => (
-                        <span key={`${tag}-${i}`} className="text-xs px-2 py-0.5">{tag}</span>
+                        <span key={`${tag}-${i}`} className="text-xs px-2 py-0.5 bg-amber-100 rounded-full text-amber-800 font-medium">{tag}</span>
                     ))}
                     {extra > 0 && (
-                        <span className="text-xs px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded">
+                        <span className="text-xs px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded-full text-gray-700 dark:text-gray-200">
                             + {extra} more
                         </span>
                     )}
                 </div>
 
                 {recipe.calories > 0 && (
-                    <div className="flex items-center text-sm">
+                    <div className="flex items-center justify-center text-sm mt-2">
                         <FireIcon className="w-5 h-5 mr-1 text-amber-400" />
-                        <span className="block mb-2 text-xs">{Math.round(recipe.calories)} Cal</span>
+                        <span className="block text-xs text-gray-700">{Math.round(recipe.calories)} Cal</span>
                     </div>
                 )}
             </article>

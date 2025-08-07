@@ -22,27 +22,32 @@ export default function FeaturedRecipe() {
 
   if (loading) {
     return (
-      <div className="py-16 container mx-auto">
-        <div className="animate-pulse bg-amber-200 h-64 rounded mb-4" />
+      <div className="py-16 flex justify-center items-center">
+        <div className="animate-pulse bg-amber-100 h-64 w-full max-w-xl rounded-lg shadow-lg" />
       </div>
     );
   }
 
   if (!recipe) {
     return (
-      <div className="py-16 text-center">
-        No featured recipe available.
+      <div className="py-16 flex justify-center items-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 text-center text-gray-500">
+          No featured recipe available.
+        </div>
       </div>
     );
   }
 
   return (
-    <section className="py-16">
-      <div className="container mx-auto text-center mb-8">
-        <h2 className="text-3xl font-bold">Featured Recipe</h2>
+    <section className="py-16 bg-gradient-to-r from-amber-50 to-rose-100">
+      <div className="container mx-auto text-center mb-8 px-4">
+        <h2 className="text-3xl md:text-4xl font-bold tracking-wide text-amber-800 mb-4">Featured Recipe</h2>
+        <p className="text-lg text-gray-700 mb-2">Discover something delicious, handpicked for you!</p>
       </div>
-      <div className="container bg-amber-200 mx-auto">
-        <RecipeCard recipe={recipe} />
+      <div className="flex justify-center items-center px-4">
+        <div className="w-full max-w-xl bg-amber-50 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+          <RecipeCard recipe={recipe} />
+        </div>
       </div>
     </section>
   );

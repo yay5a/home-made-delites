@@ -1,21 +1,34 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
 @tailwind utilities;
 
 /* -------------------------------
   1) Design tokens (dark theme)
    ------------------------------- */
 :root {
-    --bg:        28 52% 20%;  /* caf-noir (#4D3118) */
-    --bg-2:      27 39% 31%;  /* coffee (#6F4D31) */
-    --surface:   31 22% 38%;  /* coyote (#76614B) */
-    --surface-2: 30 34% 39%;  /* coyote-2 (#876542) */
-    --text:      30 58% 96%;  /* cream (#FFF7ED) */
-    --muted:     29 28% 47%;  /* chamoisee (#9A7757) */
-    --accent:    29 28% 47%;  /* chamoisee (#9A7757) */
-    --accent-2:  30 58% 96%;  /* cream (#FFF7ED) */
-    --ring:      29 28% 47%;  /* chamoisee (#9A7757) */
-    --shadow:    28 52% 8%;   /* caf-noir, 8% (rgba(77,49,24,0.08) */
+    --bg: 28 52% 20%;
+    /* caf-noir (#4D3118) */
+    --bg-2: 27 39% 31%;
+    /* coffee (#6F4D31) */
+    --surface: 31 22% 38%;
+    /* coyote (#76614B) */
+    --surface-2: 30 34% 39%;
+    /* coyote-2 (#876542) */
+    --text: 30 58% 96%;
+    /* cream (#FFF7ED) */
+    --muted: 29 28% 47%;
+    /* chamoisee (#9A7757) */
+    --accent: 29 28% 47%;
+    /* chamoisee (#9A7757) */
+    --accent-2: 30 58% 96%;
+    /* cream (#FFF7ED) */
+    --ring: 29 28% 47%;
+    /* chamoisee (#9A7757) */
+    --shadow: 28 52% 8%;
+    /* caf-noir, 8% (rgba(77,49,24,0.08) */
 }
+
 /* -------------------------------
   2) Base canvas & typography
    ------------------------------- */
@@ -38,6 +51,7 @@ a {
     color: var(--accent);
     text-decoration: none;
 }
+
 a:hover {
     color: var(--accent-2);
     text-underline-offset: 2px;
@@ -64,14 +78,17 @@ h6 {
     width: 10px;
     height: 10px;
 }
+
 *::-webkit-scrollbar-track {
     background: var(--bg-2);
 }
+
 *::-webkit-scrollbar-thumb {
     background: hsl(24 20% 60%);
     border-radius: 999px;
     border: 2px solid hsl(var(--bg-2));
 }
+
 /* -------------------------------
   3) Background gradient & wave
    ------------------------------- */
@@ -85,26 +102,22 @@ body::before {
     pointer-events: none;
 
     background:
-        /* left glow */ radial-gradient(
-            900px 320px at 16% 110px,
+        /* left glow */
+        radial-gradient(900px 320px at 16% 110px,
             hsl(30 80% 85% / 0.4) 20%,
-            transparent 70%
-        ),
-        /* right glow */ radial-gradient(
-            900px 320px at 84% 140px,
+            transparent 70%),
+        /* right glow */
+        radial-gradient(900px 320px at 84% 140px,
             hsl(40 70% 83% / 0.4) 20%,
-            transparent 70%
-        ),
-        /* header canopy */ radial-gradient(
-            1200px 520px at 50% -220px,
+            transparent 70%),
+        /* header canopy */
+        radial-gradient(1200px 520px at 50% -220px,
             hsl(var(--surface)) 35%,
-            transparent 60%
-        ),
-        /* base vertical blend */ linear-gradient(
-            180deg,
+            transparent 60%),
+        /* base vertical blend */
+        linear-gradient(180deg,
             hsl(var(--bg-2)) 0%,
-            hsl(var(--bg)) 60%
-        );
+            hsl(var(--bg)) 60%);
 }
 
 /* Optional: super-subtle film grain to avoid flat bands */
@@ -124,7 +137,7 @@ body::before {
 
 /* Card */
 .card {
-    background: var(--surface) / 0.6);
+    background: hsl(var(--surface) / 0.6);
     border: 1px solid rgb(255 255 255 / 0.06);
     backdrop-filter: blur(8px);
     border-radius: 1rem;
@@ -142,6 +155,7 @@ body::before {
     position: relative;
     color: var(--accent);
 }
+
 .link-underline::after {
     content: "";
     position: absolute;
@@ -149,15 +163,14 @@ body::before {
     right: 0;
     bottom: -3px;
     height: 1px;
-    background: linear-gradient(
-        90deg,
-        var(--accent) 0%,
-        var(--accent-2) 100%
-    );
+    background: linear-gradient(90deg,
+            var(--accent) 0%,
+            var(--accent-2) 100%);
     transform: scaleX(0.7);
     opacity: 0.7;
     transition: transform 0.2s ease, opacity 0.2s ease;
 }
+
 .link-underline:hover::after {
     transform: scaleX(1);
     opacity: 1;
@@ -166,24 +179,29 @@ body::before {
 /* Small helper for hairline separators */
 .hr {
     height: 1px;
-    background: linear-gradient(
-        to right,
-        transparent,
-        rgb(255 255 255 / 0.06),
-        transparent
-    );
+    background: linear-gradient(to right,
+            transparent,
+            rgb(255 255 255 / 0.06),
+            transparent);
 }
 
 /* Utility for translucent nav background on scroll (optional JS toggling) */
 .nav-blur {
-    background: linear-gradient(180deg, var(--bg-2) / 0.85), transparent);
+    background: linear-gradient(180deg, hsl(var(--bg-2) / 0.85), transparent);
     backdrop-filter: saturate(1.2) blur(8px);
     border-bottom: 1px solid rgb(255 255 255 / 0.05);
 }
 
 @keyframes wiggle {
-    0%, 100% { transform: rotate(-3deg); }
-    50% { transform: rotate(3deg); }
+
+    0%,
+    100% {
+        transform: rotate(-3deg);
+    }
+
+    50% {
+        transform: rotate(3deg);
+    }
 }
 
 .sunlight-glow {
@@ -198,15 +216,10 @@ body::before {
 
 /* Button primitives */
 .btn {
-  @apply inline-flex items-center justify-center font-semibold transition
-    rounded-lg px-4 py-2 shadow-sm
-    border border-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
-  cursor: pointer;
+    @apply inline-flex items-center justify-center font-semibold transition rounded-lg px-4 py-2 shadow-sm border border-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    cursor: pointer;
 }
 
 .btn-primary {
-  @apply bg-[var(--accent-2)] 
-    hover:bg-[var(--accent)]
-    focus-visible:ring-[var(--ring)];
+    @apply bg-[var(--accent-2)] hover:bg-[var(--accent)] focus-visible:ring-[var(--ring)];
 }
-

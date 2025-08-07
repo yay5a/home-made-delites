@@ -30,7 +30,7 @@ export default function Nav() {
             {/* Mobile Menu Toggle */}
             <button
                 onClick={() => setOpenMenu(!openMenu)}
-                className="md:hidden p-2 rounded-md text-foreground hover:bg-foreground/10 transition-colors"
+                className="md:hidden p-2 rounded-md text-amber-800 hover:bg-amber-100 transition-colors"
                 aria-label="Toggle menu"
             >
                 <svg
@@ -45,8 +45,8 @@ export default function Nav() {
                     {openMenu ? (
                         <path d="M6 18L18 6M6 6l12 12" />
                     ) : (
-                            <path d="M4 6h16M4 12h16M4 18h16" />
-                        )}
+                        <path d="M4 6h16M4 12h16M4 18h16" />
+                    )}
                 </svg>
             </button>
 
@@ -57,8 +57,8 @@ export default function Nav() {
                     className="md:hidden mt-2 space-y-2 p-4 shadow-lg"
                 >
                     {navItems.map(({ href, label }) => (
-                    <li key={href}>
-                        <Link
+                        <li key={href}>
+                            <Link
                                 href={href}
                                 className="block text-amber-800 hover:text-amber-600"
                                 onClick={() => setOpen(false)}
@@ -72,4 +72,3 @@ export default function Nav() {
         </nav>
     );
 }
-

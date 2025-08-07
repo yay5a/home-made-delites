@@ -20,21 +20,24 @@ export default function Home() {
         <>
             {/* Hero Section */}
             <section className="relative py-20 container mx-auto text-center overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('/images/utensils.svg')] bg-cover bg-center opacity-5 pointer-events-none" aria-hidden="true"></div>
-                    <h1 className={`${greatVibes.className} text-4xl md:text-5xl sunlight-glow relative z-10`}>
-                        Bring the warmth of home made delights to your table.
-                    </h1>
+                <div className="absolute inset-0 bg-[url('/images/utensils.svg')] bg-cover bg-center opacity-5 pointer-events-none" aria-hidden="true"></div>
+                <h1 className={`${greatVibes.className} text-4xl md:text-5xl sunlight-glow relative z-10`}>
+                    Bring the warmth of home made delights to your table.
+                </h1>
 
-                    <p className="mt-4 text-lg relative z-10">
-                        Discover, create, and share delicious homemade recipes with our community of passionate home cooks.
-                    </p>
+                <p className="mt-4 text-lg relative z-10">
+                    Discover, create, and share delicious homemade recipes with our community of passionate home cooks.
+                </p>
             </section>
             <hr />
 
             {/* Search Modal */}
             <section className="py-2">
                 <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-                    <button onClick={() => setShowSearchBar(v => !v)} className="btn btn-primary shadow-sm hover:shadow-md group">
+                    <button
+                        onClick={() => setShowSearchBar(v => !v)}
+                        className="flex items-center px-4 py-2 bg-amber-100 text-amber-800 font-bold rounded-lg shadow hover:bg-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400 transition-colors group"
+                    >
                         <MagnifyingGlassIcon className="h-5 w-5 mr-2 group-hover:animate-[wiggle_0.3s_ease-in-out]" />
                         Search
                     </button>
@@ -51,9 +54,14 @@ export default function Home() {
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
                             placeholder="Search recipes..."
-                            className="px-3 py-2 border rounded w-100"
+                            className="px-4 py-2 border border-gray-300 rounded-lg w-full max-w-md text-amber-800 bg-white shadow focus:outline-none focus:ring-2 focus:ring-amber-400"
                         />
-                        <button type="submit" className="btn btn-primary">Go</button>
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-amber-100 text-amber-800 font-bold rounded-lg shadow hover:bg-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400 transition-colors"
+                        >
+                            Go
+                        </button>
                     </form>
                 )}
                 <SearchModal
@@ -103,4 +111,3 @@ export default function Home() {
         </>
     );
 }
-
