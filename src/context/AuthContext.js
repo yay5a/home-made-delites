@@ -51,13 +51,13 @@ export const AuthProvider = ({ children }) => {
         fetchUser(storedToken);
     }, []);
 
-    const login = async (email, password) => {
+    const login = async (username, password) => {
         setLoading(true);
         try {
             const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ username, password })
             });
             if (!res.ok) {
                 const data = await res.json();
@@ -77,13 +77,13 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const register = async (name, email, password) => {
+    const register = async (username, email, password) => {
         setLoading(true);
         try {
             const res = await fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password })
+                body: JSON.stringify({ username, email, password })
             });
             if (!res.ok) {
                 const data = await res.json();

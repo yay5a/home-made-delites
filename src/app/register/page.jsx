@@ -7,7 +7,7 @@ import { AuthContext } from '@/context/AuthContext';
 
 export default function RegisterPage() {
   const { register, isAuthenticated, error, loading } = useContext(AuthContext);
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await register(name, email, password);
+    await register(username, email, password);
   };
 
   return (
@@ -27,12 +27,13 @@ export default function RegisterPage() {
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block mb-1">Name</label>
+          <label className="block mb-1">Username</label>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-full border px-3 py-2 rounded"
+            required
           />
         </div>
         <div>
