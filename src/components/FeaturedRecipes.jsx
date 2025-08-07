@@ -30,7 +30,7 @@ export default function FeaturedRecipe() {
 
   if (!recipe) {
     return (
-      <div className="py-16 text-center text-gray-500">
+      <div className="py-16 text-center">
         No featured recipe available.
       </div>
     );

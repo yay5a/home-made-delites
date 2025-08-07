@@ -29,7 +29,7 @@ export default function SearchModal() {
           <div className="modal-content space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Search Recipes</h2>
-              <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-gray-700">
+              <button onClick={() => setOpen(false)} className="hover:text-gray-700">
                 &times;
               </button>
             </div>

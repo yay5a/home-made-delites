@@ -5,7 +5,7 @@ import FeaturedRecipes from '@/components/FeaturedRecipes';
 
 export default function Home() {
     return (
-        <main className="container mx-auto p-4 sm:p-8 md:grid md:grid-cols-[260px_1fr] gap-8  mt-8 space-y-6 md:mt-0">
+        <>
             {/* Hero Section */}
             <section className="py-16">
                 <h1 className="text-4xl font-extrabold">
@@ -57,7 +57,7 @@ export default function Home() {
                     </div>
                 </div>
             </section>
-        </main>
+    </>
     );
 }
 
