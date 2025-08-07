@@ -39,15 +39,12 @@ export default function FeaturedRecipe() {
   }
 
   return (
-    <section className="py-16 bg-gradient-to-r from-amber-50 to-rose-100">
-      <div className="container mx-auto text-center mb-8 px-4">
-        <h2 className="text-3xl md:text-4xl font-bold tracking-wide text-amber-800 mb-4">Featured Recipe</h2>
-        <p className="text-lg text-gray-700 mb-2">Discover something delicious, handpicked for you!</p>
-      </div>
-      <div className="flex justify-center items-center px-4">
-        <div className="w-full max-w-xl bg-amber-50 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-          <RecipeCard recipe={recipe} />
+    <section className="py-16 bg-gradient-to-r from-amber-50 to-rose-100 flex justify-center items-center">
+      <div className="w-full max-w-xl bg-white bg-opacity-80 rounded-2xl shadow-2xl p-8 border-4 border-amber-100 relative">
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2">
+          <span className="inline-block bg-gradient-to-r from-amber-400 to-rose-400 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">Featured</span>
         </div>
+        <RecipeCard recipe={recipe} />
       </div>
     </section>
   );

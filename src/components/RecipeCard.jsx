@@ -25,11 +25,16 @@ export default function RecipeCard({ recipe }) {
             <article className="p-6 space-y-4 bg-amber-50 border border-amber-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
                 <Link
                     href={recipe.url}
-                    className="block py-2 text-center font-bold text-amber-800 text-xl md:text-2xl tracking-wide focus:outline-none focus:ring-2 focus:ring-amber-400 rounded"
+                    className="block py-2 text-center font-bold text-amber-800 text-xl md:text-2xl tracking-wide focus:outline-none focus:ring-2 focus:ring-amber-400 rounded transition-colors hover:text-amber-600 hover:bg-amber-100 active:text-amber-700"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <h3 className={`${patrick.className} text-2xl mb-2`}>{recipe.label}</h3>
+                    <div className="flex flex-col items-center">
+                        <h3 className={`${patrick.className} text-2xl mb-2 flex items-center justify-center`} style={{ cursor: 'pointer' }}>
+                            {recipe.label}
+                        </h3>
+                        <span className="block w-2/3 h-1 bg-gradient-to-r from-amber-400 via-amber-600 to-amber-400 rounded-full mt-1"></span>
+                    </div>
                 </Link>
                 {recipe.image ? (
                     <Image
