@@ -1,4 +1,4 @@
-<!-- # Home Made Delites
+# Home Made Delites
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Next.js Version](https://img.shields.io/badge/next.js-15.4.5-blueviolet)
@@ -90,4 +90,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 Built with ❤️ by the Home Made Delites Team
 
--->
