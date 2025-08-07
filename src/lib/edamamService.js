@@ -13,7 +13,7 @@ export default async function fetchRecipes(query) {
 		throw new Error(`Search request failed: ${res.status} ${res.statusText}`);
 	}
     const { results } = await res.json();
-  return results.map(r => ({
+  return results.map(({ uri, label, image, dietLabel, cuisineType, mealType, calories, url }) => ({
     id: uri,
     title: label,
     image: image,
