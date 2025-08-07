@@ -24,9 +24,10 @@ export default function RootLayout({ children }) {
 		<html lang='en'>
 			<body className='antialiased' >
                 <Header />
-                <main className='flex-grow'>
+
+        <main id="main-content" className="container mx-auto p-4 sm:p-8 md:grid md:grid-cols-[260px_1fr] gap-8  mt-8 space-y-6 md:mt-0">
                     {children}
-                </main>
+                    </main>
                 <Footer />
 			</body>
 		</html>

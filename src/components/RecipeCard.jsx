@@ -17,14 +17,15 @@ export default function RecipeCard({ recipe = {} }) {
   } = recipe;
 
   return (
-    <article className="card overflow-hidden border rounded-lg shadow-sm">
+    <article className="card p-4 space-y-2">
       {image ? (
-        <div className="relative w-full h-48">
+        <div className="mb-4">
           <Image
             src={image}
             alt={title}
-            fill
-            className="object-cover"
+            width={300}
+            height={200}
+            className="object-contain mx-auto mb-4 rounded"
           />
         </div>
       ) : (
@@ -38,7 +39,7 @@ export default function RecipeCard({ recipe = {} }) {
           {[...cuisineType, ...dietLabels, ...mealType].map((tag, i) => (
             <span
               key={`${tag}-${i}`}
-              className="text-xs text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full"
+              className="text-xs text-gray-700 px-2 py-0.5 block"
             >
               {tag}
             </span>
@@ -48,17 +49,17 @@ export default function RecipeCard({ recipe = {} }) {
         {calories > 0 && (
           <div className="flex items-center text-gray-600 text-sm">
             <FireIcon className="w-5 h-5 mr-1 text-red-500" />
-            <span>{Math.round(calories)} Cal</span>
+            <span className="block mb-2 text-xs text-slate-400">{Math.round(calories)} Cal</span>
           </div>
         )}
 
         <Link
           href={link}
-          className="block mt-2 hover:underline"
+          className="text-md font-semibold"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+          <h3 className="text-xl font-semibold">{title}</h3>
         </Link>
       </div>
     </article>
