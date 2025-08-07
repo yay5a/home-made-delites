@@ -25,7 +25,8 @@ export default function RootLayout({ children }) {
             <body className='antialiased' >
                 <Header />
 
-                <main id="main-content" className="container mx-auto p-4 sm:p-8 md:grid md:grid-cols-[260px_1fr] gap-8  mt-8 space-y-6 md:mt-0">
+                <main id="main-content"
+                    className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
                     {children}
                 </main>
                 <Footer />

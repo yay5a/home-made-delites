@@ -204,3 +204,18 @@ body::before {
     backdrop-filter: saturate(1.2) blur(8px);
     border-bottom: 1px solid rgb(255 255 255 / 0.05);
 }
+
+/* Button primitives */
+.btn {
+  @apply inline-flex items-center justify-center font-semibold transition
+    rounded-lg px-4 py-2 shadow-sm
+    border border-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+  cursor: pointer;
+}
+
+.btn-primary {
+  @apply bg-[hsl(var(--accent))] text-white
+    hover:bg-[hsl(var(--accent-2))]
+    focus-visible:ring-[hsl(var(--ring))];
+}
+

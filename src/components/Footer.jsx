@@ -6,67 +6,72 @@ import { SiX } from 'react-icons/si';
 import Link from 'next/link';
 
 export default function Footer() {
-
     return (
-
-        <footer className='bg-gray-800 text-white'>
-            <div className='container'>
-                <div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
-                    <div className='col-span-1 md:col-span-2'>
-                        <h3 className='text-lg font-semibold mb-4'>Home Made Delites</h3>
-                        <p className='text-gray-300 mb-4'>
-                            Discover and share delicious homemade recipes with our community of food
-                            lovers.
-                        </p>
-                        <div className="flex space-x-4 mb-4">
-                            <Link href="https://facebook.com" aria-label="">
-
-                                <SiFacebook className="h-6 w-6 text-gray-300 hover:text-white" />
-                            </Link>
-                            <Link href="https://instagram.com" aria-label="">
-                                <SiInstagram className="h-6 w-6 text-gray-300 hover:text-white" />
-                            </Link>
-                            <Link href="https://x.com" aria-label="">
-
-                                <SiX className="h-6 w-6 text-gray-300 hover:text-white" />
-                            </Link>
-
-                        </div>
+        <footer className="bg-gray-900 text-gray-300 pt-10 pb-6">
+            <div className="container mx-auto grid gap-8 md:grid-cols-12">
+                {/* Brand + Social */}
+                <div className="md:col-span-4 space-y-4">
+                    <h3 className="text-lg font-semibold text-white">Home Made Delites</h3>
+                    <p>
+                        Discover and share delicious homemade recipes with our community of food
+                        lovers.
+                    </p>
+                    <div className="flex space-x-4">
+                        <SocialIcon href="https://facebook.com" label="Facebook">
+                            <SiFacebook className="w-6 h-6" />
+                        </SocialIcon>
+                        <SocialIcon href="https://instagram.com" label="Instagram">
+                            <SiInstagram className="w-6 h-6" />
+                        </SocialIcon>
+                        <SocialIcon href="https://x.com" label="X / Twitter">
+                            <SiX className="w-6 h-6" />
+                        </SocialIcon>
                     </div>
+                </div>
 
-					<div>
-						<h3 className='text-sm font-semibold mb-4 uppercase tracking-wider'>Support</h3>
-						<ul className='space-y-2'>
-							<li>
-								<a href='#' className='text-gray-300 hover:text-white'>
-									Help Center
-								</a>
-							</li>
-							<li>
-								<a href='#' className='text-gray-300 hover:text-white'>
-									Contact Us
-								</a>
-							</li>
-							<li>
-								<a href='#' className='text-gray-300 hover:text-white'>
-									Privacy Policy
-								</a>
-							</li>
-							<li>
-								<a href='#' className='text-gray-300 hover:text-white'>
-									Terms of Service
-								</a>
-							</li>
-						</ul>
-					</div>
-				</div>
+                {/* Support links */}
+                <div className="md:col-span-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-white mb-4">
+                        Support
+                    </h3>
+                    <ul className="space-y-2">
+                        {[
+                            { href: '#', text: 'Help Center' },
+                            { href: '#', text: 'Contact Us' },
+                            { href: '#', text: 'Privacy Policy' },
+                            { href: '#', text: 'Terms of Service' },
+                        ].map(({ href, text }) => (
+                                <li key={text}>
+                                    <FooterLink href={href}>{text}</FooterLink>
+                                </li>
+                            ))}
+                    </ul>
+                </div>
 
-				<div className='mt-8 pt-8 border-t border-gray-700'>
-					<p className='text-center text-gray-300'>
-						© 2025 Home Made Delites. All rights reserved.
-					</p>
-				</div>
-			</div>
-		</footer>
+                {/* Legal copy pushed right on desktop */}
+                <div className="md:col-span-5 flex items-end md:justify-end">
+                    <p className="text-sm" aria-label="Copyright">
+                        &copy; {new Date().getFullYear()} Home Made Delites Developed by Yaysa. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </footer>
     );
 }
+
+function FooterLink({ href, children }) {
+    return (
+        <Link href={href} className="hover:text-white transition-colors">
+            {children}
+        </Link>
+    );
+}
+
+function SocialIcon({ href, label, children }) {
+    return (
+        <Link href={href} aria-label={label} className="hover:text-white transition-colors">
+            {children}
+        </Link>
+    );
+}
+

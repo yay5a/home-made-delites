@@ -54,7 +54,7 @@ export default function Nav() {
             {openMenu && (
                 <ul
                     id="mobile-menu"
-                    className="md:hidden mt-2 space-y-2 bg-white p-4 shadow-lg"
+                    className="md:hidden mt-2 space-y-2 p-4 shadow-lg"
                 >
                     {navItems.map(({ href, label }) => (
                         <li key={href}>
