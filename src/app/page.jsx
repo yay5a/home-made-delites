@@ -58,11 +58,6 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="text-center mt-8">
-            <Link href="/login" className="btn btn-primary">
-              Join Our Community
-            </Link>
-          </div>
         </div>
       </section>
     </div>

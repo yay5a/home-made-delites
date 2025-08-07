@@ -1,5 +1,5 @@
 export default async function fetchRecipes(query) {
-    const query = 'This is a fetched recipe';
+    query = 'This is a fetched recipe';
 /*	const isServer = typeof window === 'undefined';
 	const base = isServer ? process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' : '';
 
