@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import Nav from '@/components/Nav';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { AuthProvider } from '@/context/AuthContext';
 import './globals.css';
 
 const geistSans = Geist({
@@ -23,13 +24,15 @@ export default function RootLayout({ children }) {
     return (
         <html lang='en'>
             <body className='antialiased' >
-                <Header />
+                <AuthProvider>
+                    <Header />
 
-                <main id="main-content"
-                    className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
-                    {children}
-                </main>
-                <Footer />
+                    <main id="main-content"
+                        className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+                        {children}
+                    </main>
+                    <Footer />
+                </AuthProvider>
             </body>
         </html>
     );

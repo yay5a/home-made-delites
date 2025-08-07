@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Link from 'next/link';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { HeartIcon, BookmarkSquareIcon, DevicePhoneMobileIcon } from '@heroicons/react/24/solid';
@@ -10,11 +10,13 @@ const greatVibes = Great_Vibes({ subsets: ['latin'], weight: '400' });
 
 import SearchModal from '@/components/SearchModal';
 import FeaturedRecipes from '@/components/FeaturedRecipes';
+import { AuthContext } from '@/context/AuthContext';
 
 export default function Home() {
     const [showSearchBar, setShowSearchBar] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [modalOpen, setModalOpen] = useState(false);
+    const { isAuthenticated } = useContext(AuthContext);
 
     return (
         <>
@@ -33,42 +35,54 @@ export default function Home() {
 
             {/* Search Modal */}
             <section className="py-2">
-                <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-                    <button
-                        onClick={() => setShowSearchBar(v => !v)}
-                        className="flex items-center px-4 py-2 bg-amber-100 text-amber-800 font-bold rounded-lg shadow hover:bg-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400 transition-colors group"
-                    >
-                        <MagnifyingGlassIcon className="h-5 w-5 mr-2 group-hover:animate-[wiggle_0.3s_ease-in-out]" />
-                        Search
-                    </button>
-                </div>
-                {showSearchBar && (
-                    <form
-                        onSubmit={e => {
-                            e.preventDefault();
-                            setModalOpen(true);
-                        }}
-                        className="mt-4 flex gap-2 justify-center"
-                    >
-                        <input
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            placeholder="Search recipes..."
-                            className="px-4 py-2 border border-gray-300 rounded-lg w-full max-w-md text-amber-800 bg-white shadow focus:outline-none focus:ring-2 focus:ring-amber-400"
+                {isAuthenticated ? (
+                    <>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                            <button
+                                onClick={() => setShowSearchBar(v => !v)}
+                                className="flex items-center px-4 py-2 bg-amber-100 text-amber-800 font-bold rounded-lg shadow hover:bg-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400 transition-colors group"
+                            >
+                                <MagnifyingGlassIcon className="h-5 w-5 mr-2 group-hover:animate-[wiggle_0.3s_ease-in-out]" />
+                                Search
+                            </button>
+                        </div>
+                        {showSearchBar && (
+                            <form
+                                onSubmit={e => {
+                                    e.preventDefault();
+                                    setModalOpen(true);
+                                }}
+                                className="mt-4 flex gap-2 justify-center"
+                            >
+                                <input
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                    placeholder="Search recipes..."
+                                    className="px-4 py-2 border border-gray-300 rounded-lg w-full max-w-md text-amber-800 bg-white shadow focus:outline-none focus:ring-2 focus:ring-amber-400"
+                                />
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-amber-100 text-amber-800 font-bold rounded-lg shadow hover:bg-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400 transition-colors"
+                                >
+                                    Go
+                                </button>
+                            </form>
+                        )}
+                        <SearchModal
+                            open={modalOpen}
+                            onClose={() => setModalOpen(false)}
+                            query={searchQuery}
                         />
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-amber-100 text-amber-800 font-bold rounded-lg shadow hover:bg-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400 transition-colors"
-                        >
-                            Go
-                        </button>
-                    </form>
+                    </>
+                ) : (
+                    <div className="text-center mt-8">
+                        <p className="text-amber-800">Please sign in to search for recipes.</p>
+                        <p className="mt-2">
+                            <Link href="/login" className="text-amber-600 underline">Login</Link> or{' '}
+                            <Link href="/register" className="text-amber-600 underline">Register</Link>
+                        </p>
+                    </div>
                 )}
-                <SearchModal
-                    open={modalOpen}
-                    onClose={() => setModalOpen(false)}
-                    query={searchQuery}
-                />
             </section>
 
             {/* Featured Recipe  Modal */}

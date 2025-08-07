@@ -1,18 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Link from 'next/link';
-// TODO import { useContext } from 'react';
-// TODO import { AuthContext } from '@/context/AuthContext';
-
-const navItems = [
-    { href: '/', label: 'Home' },
-    { href: '/login', label: 'Login' },
-    { href: '/register', label: 'Register' },
-];
+import { AuthContext } from '@/context/AuthContext';
 
 export default function Nav() {
     const [openMenu, setOpenMenu] = useState(false);
+    const { isAuthenticated, logout } = useContext(AuthContext);
+
+    const navItems = [
+        { href: '/', label: 'Home' },
+        ...(!isAuthenticated ? [
+            { href: '/login', label: 'Login' },
+            { href: '/register', label: 'Register' }
+        ] : [])
+    ];
 
     return (
         <nav className="relative top-0 w-full z-50">
@@ -26,6 +28,13 @@ export default function Nav() {
                         </Link>
                     </li>
                 ))}
+                {isAuthenticated && (
+                    <li>
+                        <button onClick={logout} className="text-amber-800 hover:text-amber-600">
+                            Logout
+                        </button>
+                    </li>
+                )}
             </ul>
             {/* Mobile Menu Toggle */}
             <button
@@ -61,12 +70,25 @@ export default function Nav() {
                             <Link
                                 href={href}
                                 className="block text-amber-800 hover:text-amber-600"
-                                onClick={() => setOpen(false)}
+                                onClick={() => setOpenMenu(false)}
                             >
                                 {label}
                             </Link>
                         </li>
                     ))}
+                    {isAuthenticated && (
+                        <li>
+                            <button
+                                onClick={() => {
+                                    logout();
+                                    setOpenMenu(false);
+                                }}
+                                className="block text-amber-800 hover:text-amber-600"
+                            >
+                                Logout
+                            </button>
+                        </li>
+                    )}
                 </ul>
             )}
         </nav>
