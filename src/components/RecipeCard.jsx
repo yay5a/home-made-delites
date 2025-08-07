@@ -4,6 +4,9 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { XMarkIcon, FireIcon } from '@heroicons/react/24/solid';
+import { Patrick_Hand } from 'next/font/google';
+
+const patrick = Patrick_Hand({ subsets: ['latin'], weight: '400' });
 
 export default function RecipeCard({ recipe }) {
     if (!recipe) return null;   
@@ -19,14 +22,14 @@ export default function RecipeCard({ recipe }) {
 
     return (
         <>
-            <article className="card p-4 space-y-2">
+            <article className="p-4 space-y-2 bg-amber-50 bg-[url('/images/paper-texture.svg')] bg-repeat border border-amber-200 rounded-lg shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
                 <Link
                     href={recipe.url}
                     className="py-4 text-center font-semibold focus:ring"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <h3 className="text-xl font-semibold">{recipe.label}</h3>
+                    <h3 className={`${patrick.className} text-2xl`}>{recipe.label}</h3>
                 </Link>
                 {recipe.image ? (
                         <Image

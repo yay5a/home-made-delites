@@ -7,11 +7,11 @@ import Link from 'next/link';
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-900 text-gray-300 pt-10 pb-6">
+        <footer className="footer-cozy text-stone-800 pt-10 pb-6 border-t-4 border-dotted border-amber-300">
             <div className="container mx-auto grid gap-8 md:grid-cols-12">
                 {/* Brand + Social */}
                 <div className="md:col-span-4 space-y-4">
-                    <h3 className="text-lg font-semibold text-white">Home Made Delites</h3>
+                    <h3 className="text-lg font-semibold text-stone-900">Home Made Delites</h3>
                     <p>
                         Discover and share delicious homemade recipes with our community of food
                         lovers.
@@ -31,7 +31,7 @@ export default function Footer() {
 
                 {/* Support links */}
                 <div className="md:col-span-3">
-                    <h3 className="text-sm font-semibold uppercase tracking-wider text-white mb-4">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-900 mb-4">
                         Support
                     </h3>
                     <ul className="space-y-2">
@@ -61,7 +61,7 @@ export default function Footer() {
 
 function FooterLink({ href, children }) {
     return (
-        <Link href={href} className="hover:text-white transition-colors">
+        <Link href={href} className="hover:text-stone-900 transition-colors">
             {children}
         </Link>
     );
@@ -69,7 +69,7 @@ function FooterLink({ href, children }) {
 
 function SocialIcon({ href, label, children }) {
     return (
-        <Link href={href} aria-label={label} className="hover:text-white transition-colors">
+        <Link href={href} aria-label={label} className="hover:text-stone-900 transition-colors">
             {children}
         </Link>
     );
