@@ -23,7 +23,7 @@ export default function FeaturedRecipe() {
   if (loading) {
     return (
       <div className="py-16 container mx-auto">
-        <div className="animate-pulse bg-gray-200 h-64 rounded mb-4" />
+        <div className="animate-pulse bg-amber-200 h-64 rounded mb-4" />
       </div>
     );
   }
@@ -41,7 +41,7 @@ export default function FeaturedRecipe() {
       <div className="container mx-auto text-center mb-8">
         <h2 className="text-3xl font-bold">Featured Recipe</h2>
       </div>
-      <div className="container mx-auto">
+      <div className="container bg-amber-200 mx-auto">
         <RecipeCard recipe={recipe} />
       </div>
     </section>

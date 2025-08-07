@@ -22,7 +22,7 @@ export default function RecipeCard({ recipe }) {
 
     return (
         <>
-            <article className="p-4 space-y-2 bg-amber-50 bg-[url('/images/paper-texture.svg')] bg-repeat border border-amber-200 rounded-lg shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
+            <article className="p-4 space-y-2 bg-[url('/images/paper-texture.svg')] bg-repeat border border-amber-200 rounded-lg shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
                 <Link
                     href={recipe.url}
                     className="py-4 text-center font-semibold focus:ring"

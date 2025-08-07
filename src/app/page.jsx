@@ -69,7 +69,7 @@ export default function Home() {
             </section>
 
             {/* HMD Features */}
-            <section className="py-12 bg-orange-50">
+            <section className="py-12 bg-orange-50 sunlight-glow">
                 <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                     <Link href="/login" className="btn btn-primary">
                         Join&nbsp;Our&nbsp;Community
