@@ -1,5 +1,7 @@
+'use client';
+
 import React, { createContext, useState, useEffect } from 'react';
-import * as jwtDecode from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 
 export const AuthContext = createContext();
 
@@ -75,6 +77,32 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const register = async (name, email, password) => {
+        setLoading(true);
+        try {
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || 'Registration failed');
+            }
+            const { token: jwt, user: userData } = await res.json();
+            localStorage.setItem('token', jwt);
+            setToken(jwt);
+            setUser(userData);
+            setError(null);
+        } catch (err) {
+            setError(err.message);
+            setUser(null);
+            setToken(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem('token');
         setToken(null);
@@ -91,6 +119,7 @@ export const AuthProvider = ({ children }) => {
                 loading,
                 error,
                 login,
+                register,
                 logout
             }}>
             {children}
