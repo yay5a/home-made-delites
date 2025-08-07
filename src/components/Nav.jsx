@@ -15,13 +15,13 @@ export default function Nav() {
     const [openMenu, setOpenMenu] = useState(false);
 
     return (
-        <nav className="relative top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-black/[.08] dark:border-white/[.145]">
+        <nav className="relative top-0 w-full z-50">
             {/* Desktop Nav */}
 
             <ul className="hidden md:flex space-x-8">
                 {navItems.map(({ href, label }) => (
                     <li key={href}>
-                        <Link href={href} className="text-gray-700 hover:text-gray-900">
+                        <Link href={href} className="text-amber-800 hover:text-amber-600">
                             {label}
                         </Link>
                     </li>
@@ -57,10 +57,10 @@ export default function Nav() {
                     className="md:hidden mt-2 space-y-2 p-4 shadow-lg"
                 >
                     {navItems.map(({ href, label }) => (
-                        <li key={href}>
-                            <Link
+                    <li key={href}>
+                        <Link
                                 href={href}
-                                className="block text-gray-700 hover:text-gray-900"
+                                className="block text-amber-800 hover:text-amber-600"
                                 onClick={() => setOpen(false)}
                             >
                                 {label}

@@ -205,6 +205,21 @@ body::before {
     border-bottom: 1px solid rgb(255 255 255 / 0.05);
 }
 
+@keyframes wiggle {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+}
+
+.sunlight-glow {
+    text-shadow: 0 0 10px rgba(255, 200, 0, 0.5);
+}
+
+.footer-cozy {
+    background-color: #fef3c7;
+    background-image: radial-gradient(#fde68a 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
 /* Button primitives */
 .btn {
   @apply inline-flex items-center justify-center font-semibold transition
