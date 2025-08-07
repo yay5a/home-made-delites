@@ -4,6 +4,7 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { useRecipeSearch } from '@/hooks/useRecipeSearch';
 import RecipeCard from './RecipeCard';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 export default function SearchModal() {
 //  const { user } = useContext(AuthContext);
@@ -19,10 +20,10 @@ export default function SearchModal() {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className="btn btn-primary">
-        🔍 Search
-      </button>
-
+            <button onClick={() => setOpen(true)} className="btn btn-primary flex items-center">
+                <MagnifyingGlassIcon className="h-5 w-5 mr-2" />
+                Search
+            </button>
       {open && (
         <div className="modal-backdrop">
           <div className="modal-content space-y-4">

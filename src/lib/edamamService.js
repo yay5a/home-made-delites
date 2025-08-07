@@ -1,5 +1,6 @@
 export default async function fetchRecipes(query) {
-	const isServer = typeof window === 'undefined';
+    const query = 'This is a fetched recipe';
+/*	const isServer = typeof window === 'undefined';
 	const base = isServer ? process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' : '';
 
 	const url = `${base}/api/edamam?search=${encodeURIComponent(query)}`;
@@ -21,5 +22,6 @@ export default async function fetchRecipes(query) {
     mealType: mealType,
     calories: calories,
     link: url,
-  }));
+  })); */
+    return query;
 }
