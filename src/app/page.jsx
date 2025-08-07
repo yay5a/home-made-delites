@@ -5,7 +5,7 @@ import FeaturedRecipes from '@/components/FeaturedRecipes';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="container mx-auto p4 sm:p-8 md:grid md:grid-cols-[260px_1fr] gap-8 bg-gray-50">
       {/* Hero Section */}
       <section className="py-16 bg-white">
         <div className="container text-center">

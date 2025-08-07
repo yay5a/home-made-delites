@@ -23,6 +23,8 @@
 # misc
 .DS_Store
 *.pem
+prettier.config.mjs
+
 
 # debug
 npm-debug.log*

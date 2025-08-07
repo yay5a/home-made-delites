@@ -1,88 +1,206 @@
 @import "tailwindcss";
+@tailwind utilities;
 
+/* -------------------------------
+  1) Design tokens (dark theme)
+   ------------------------------- */
 :root {
+    /* Base surfaces */
+    --bg: 222 45% 6%; /* page background */
+    --bg-2: 222 40% 8%; /* subtle gradient base */
+    --surface: 222 30% 12%; /* cards / panels */
+    --surface-2: 222 24% 16%; /* deeper panels */
 
-    --color-primary: #6366F1;
-    --color-primary-dark: #4F46E5;
-    --spacing-base: 1rem;
-    --radius-base: 0.5rem;
+    /* Text */
+    --text: 220 15% 96%;
+    --muted: 220 10% 72%;
+
+    /* Accent (cyan/blue blend like the screenshot links) */
+    --accent: 213 94% 68%; /* primary link */
+    --accent-2: 190 85% 60%; /* hover blend */
+
+    /* Misc */
+    --ring: 213 94% 68%;
+    --shadow: 0 0% 0%;
 }
 
-@layer base {
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
-  html {
-    scroll-behavior: smooth;
-    font-size: 16px;
-  }
-  body {
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
-    font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-  }
-  a {
-    color: var(--color-primary);
+/* Optional light scheme scaffold (off by default) */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: 220 20% 98%;
+        --bg-2: 220 20% 96%;
+        --surface: 220 25% 100%;
+        --surface-2: 220 10% 94%;
+        --text: 222 40% 12%;
+        --muted: 222 10% 40%;
+        --accent: 213 90% 45%;
+        --accent-2: 190 85% 42%;
+        --ring: 213 90% 45%;
+    }
+}
+
+/* -------------------------------
+  2) Base canvas & typography
+   ------------------------------- */
+html,
+body,
+#__next {
+    height: 100%;
+}
+
+body {
+    background-color: hsl(var(--bg));
+    color: hsl(var(--text));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Subtle, consistent link style (no neon underline soup) */
+a {
+    color: hsl(var(--accent));
     text-decoration: none;
-    transition: color 0.2s ease-in-out;
-  }
-  a:hover {
-    color: var(--color-primary-dark);
-  }
+}
+a:hover {
+    color: hsl(var(--accent-2));
+    text-underline-offset: 2px;
 }
 
-@layer components {
-  .container {
-    @apply mx-auto px-4 sm:px-6 lg:px-8;
-    max-width: 1200px;
-  }
+/* Headings—let Tailwind handle sizes; keep color consistent */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: hsl(var(--text));
 }
 
-@layer components {
-  .btn {
-    @apply inline-block font-medium text-center transition-shadow;
-    padding: var(--spacing-base) calc(var(--spacing-base) * 1.5);
-    border-radius: var(--radius-base);
-  }
-  .btn-primary {
-    background-color: var(--color-primary);
-    color: white;
-    @apply shadow-md hover:shadow-lg;
-  }
-  .btn-primary:hover {
-    background-color: var(--color-primary-dark);
-  }
+/* Better focus ring that matches the accent */
+:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
 }
 
-@layer components {
-  .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm transition-shadow;
-  }
-  .card:hover {
-    @apply shadow-lg;
-  }
+/* Minimal scrollbar styling (Chromium/WebKit) */
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+*::-webkit-scrollbar-track {
+    background: hsl(var(--bg-2));
+}
+*::-webkit-scrollbar-thumb {
+    background: hsl(222 12% 28%);
+    border-radius: 999px;
+    border: 2px solid hsl(var(--bg-2));
 }
 
-@layer components {
-  .modal-backdrop {
-    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center;
-  }
-  .modal-content {
-    @apply bg-white dark:bg-gray-900 rounded-lg p-6 shadow-xl w-full max-w-md mx-4;
-  }
+/* -------------------------------
+  3) Background gradient & wave
+   ------------------------------- */
+
+/* Layer 1: large soft radial blobs + vertical blend */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+
+    background:
+    /* left glow */ radial-gradient(
+            900px 320px at 16% 110px,
+            hsl(214 70% 14% / 0.85) 20%,
+            transparent 70%
+        ),
+        /* right glow */
+            radial-gradient(
+                900px 320px at 84% 140px,
+                hsl(220 70% 12% / 0.85) 20%,
+                transparent 70%
+            ),
+        /* header canopy */
+            radial-gradient(
+                1200px 520px at 50% -220px,
+                hsl(var(--surface)) 35%,
+                transparent 60%
+            ),
+        /* base vertical blend */
+            linear-gradient(180deg, hsl(var(--bg-2)) 0%, hsl(var(--bg)) 60%);
 }
 
-@layer utilities {
-  .text-shadow-md {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  .card-hover-grow {
-    transform: translateZ(0);
-    transition: transform 0.3s ease;
-  }
-  .card-hover-grow:hover {
-    transform: scale(1.02);
-  }
+
+/* Optional: super-subtle film grain to avoid flat bands */
+.bg-noise {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(#n)' opacity='0.5'/></svg>");
 }
 
+/* -------------------------------
+  4) Reusable component primitives
+   ------------------------------- */
+
+/* Card: used for About / Projects blocks */
+.card {
+    background: hsl(var(--surface) / 0.6);
+    border: 1px solid rgb(255 255 255 / 0.06);
+    backdrop-filter: blur(8px);
+    border-radius: 1rem; /* 16px (rounded-2xl in Tailwind is 1rem by default in v3) */
+    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.04),
+        0 10px 30px -10px rgb(0 0 0 / 0.6);
+}
+
+/* Muted body text (blog excerpts) */
+.muted {
+    color: hsl(var(--muted));
+}
+
+/* Link variant with subtle animated underline */
+.link-underline {
+    position: relative;
+    color: hsl(var(--accent));
+}
+.link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        hsl(var(--accent)) 0%,
+        hsl(var(--accent-2)) 100%
+    );
+    transform: scaleX(0.7);
+    opacity: 0.7;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.link-underline:hover::after {
+    transform: scaleX(1);
+    opacity: 1;
+}
+
+/* Small helper for hairline separators */
+.hr {
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgb(255 255 255 / 0.06),
+        transparent
+    );
+}
+
+/* Utility for translucent nav background on scroll (optional JS toggling) */
+.nav-blur {
+    background: linear-gradient(180deg, hsl(var(--bg-2) / 0.85), transparent);
+    backdrop-filter: saturate(1.2) blur(8px);
+    border-bottom: 1px solid rgb(255 255 255 / 0.05);
+}
