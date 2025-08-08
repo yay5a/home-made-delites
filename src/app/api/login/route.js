@@ -48,7 +48,7 @@ export async function POST(request) {
             path: '/',
             maxAge: 60 * 60 * 24 * 7
         });
-        return res
+        return res;
     } catch (err) {
         console.error(err);
         return NextResponse.json({ message: 'Login failed' }, { status: 500 });
