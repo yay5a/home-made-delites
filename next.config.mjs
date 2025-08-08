@@ -7,11 +7,19 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'edamam-product-images.s3.amazonaws.com',
-        pathname: '/**', 
-        },
+        pathname: '/**',
+      },
     ],
+    localPatterns: [
+      {
+        pathname: '/public/**',
+        search: '',
+      },
+    ],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;"
   },
 };
 
 export default nextConfig;
-
