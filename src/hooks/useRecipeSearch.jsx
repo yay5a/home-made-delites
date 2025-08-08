@@ -32,9 +32,9 @@ export function useRecipeSearch() {
     const cache = useRef(new Map());
 
     function getCached(q) {
-        const hit = cache.current.gate(q);
-        if (!hits) return null;
-        if(Date.now() - hit.ts > CACHE_TTL ) {
+        const hit = cache.current.get(q);
+        if (!hit) return null;
+        if (Date.now() - hit.ts > CACHE_TTL) {
             cache.current.delete(q);
             return null;
         }
@@ -45,13 +45,13 @@ export function useRecipeSearch() {
         cache.current.set(q, { ts: Date.now(), data });
     }
 
-    
-        /**
-            * @param {string} query
-            * @param {object} opts
-            * @param {number} opts.limit - results cap
-            */
-        async function search(query, { limit = DEFAULT_LIMIT } = {}) {
+
+    /**
+        * @param {string} query
+        * @param {object} opts
+        * @param {number} opts.limit - results cap
+        */
+    async function search(query, { limit = DEFAULT_LIMIT } = {}) {
 
         setErrorMsg('');
         const now = Date.now();
@@ -63,19 +63,19 @@ export function useRecipeSearch() {
         if (now < clickCooldownEnds) return;
 
         clickCount.current += 1;
-    
+
         if (clickCount.current > CLICK_LIMIT) {
             setClickCooldownEnds(now + CLICK_COOLDOWN);
             clickCount.current = 0;
             return;
         }
-        
+
         const q = query.trim();
-        
+
         if (!q) return;
 
         setLoading(true);
-        
+
         const cached = getCached(q);
 
         if (cached) {

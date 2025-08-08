@@ -23,8 +23,8 @@ export default function SearchModal({ open, onClose, query }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4" onClick={onClose} >
-      <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-gray-900 rounded-xl p-8 max-w-3xl w-full shadow-2xl relative space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={onClose} >
+      <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-xl p-8 max-w-3xl w-full shadow-2xl relative space-y-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-amber-800">Search Results</h2>
           <button
