@@ -7,24 +7,23 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [token, setToken] = useState(null);
 
     const isTokenExpired = (token) => {
         try {
             const { exp } = jwtDecode(token);
-            return exp < Date.now() / 1000 - 120;
+            return exp < Date.now() / 1000;
         } catch {
             return true;
         }
     };
 
-    const fetchUser = async (token) => {
+    const fetchUser = async () => {
         try {
-            const res = await fetch('/api/user', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await fetch('/api/user', { credentials: 'include' });
             if (res.status === 401) throw new Error('Session expired');
             if (!res.ok) throw new Error('Failed to fetch user');
             const userData = await res.json();
@@ -33,7 +32,6 @@ export const AuthProvider = ({ children }) => {
         } catch (err) {
             setUser(null);
             setToken(null);
-            localStorage.removeItem('token');
             setError(err.message);
         } finally {
             setLoading(false);
@@ -41,14 +39,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        if (!storedToken || isTokenExpired(storedToken)) {
-            localStorage.removeItem('token');
-            setLoading(false);
-            return;
-        }
-        setToken(storedToken);
-        fetchUser(storedToken);
+        fetchUser();
     }, []);
 
     const login = async (username, password) => {
@@ -57,14 +48,14 @@ export const AuthProvider = ({ children }) => {
             const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username, password }),
+                credentials: 'include'
             });
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.message || 'Login failed');
             }
             const { token: jwt, user: userData } = await res.json();
-            localStorage.setItem('token', jwt);
             setToken(jwt);
             setUser(userData);
             setError(null);
@@ -83,14 +74,14 @@ export const AuthProvider = ({ children }) => {
             const res = await fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password })
+                body: JSON.stringify({ username, email, password }),
+                credentials: 'include'
             });
             if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.message || 'Registration failed');
+                await res.json();
+                throw new Error('Registration failed');
             }
             const { token: jwt, user: userData } = await res.json();
-            localStorage.setItem('token', jwt);
             setToken(jwt);
             setUser(userData);
             setError(null);
@@ -104,7 +95,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        fetch('/api/logout', { method: 'POST', credentials: 'include' });
         setToken(null);
         setUser(null);
         setError(null);

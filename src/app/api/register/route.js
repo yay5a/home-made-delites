@@ -13,30 +13,41 @@ export async function POST(request) {
         email = typeof email === 'string' ? email.trim() : '';
 
         if (!username || !email || !password) {
-            return NextResponse.json({ message: 'Username, email, and password are required' }, { status: 400 });
+            console.warn('Registration failed: missing fields', { username, email });
+            return NextResponse.json({ message: 'Registration failed' }, { status: 400 });
         }
 
         await dbConnect();
 
         const existingUser = await User.findOne({ $or: [{ username }, { email }] }).lean();
         if (existingUser) {
-            return NextResponse.json({ message: 'User with that username or email already exists' }, { status: 400 });
+            console.warn('Registration failed: username or email already exists', { username, email });
+            return NextResponse.json({ message: 'Registration failed' }, { status: 400 });
         }
 
         const hashed = await bcrypt.hash(password, 10);
         const user = await User.create({ username, email, password: hashed });
 
         if (!JWT_SECRET) {
-            return NextResponse.json({ message: 'Server error' }, { status: 500 });
+            console.warn('Registration failed: TOKEN not set');
+            return NextResponse.json({ message: 'Registration failed' }, { status: 500 });
         }
 
         const token = jwt.sign({ sub: user._id }, JWT_SECRET, { expiresIn: '7d' });
 
         const { password: _, ...userData } = user.toObject();
 
-        return NextResponse.json({ token, user: userData }, { status: 201 });
+        const res = NextResponse.json({ token, user: userData }, { status: 201 });
+        res.cookies.set('token', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 60 * 60 * 24 * 7
+        });
+        return res;
     } catch (err) {
-        console.error(err);
+        console.error('Registration failed: ', err);
         return NextResponse.json({ message: 'Registration failed' }, { status: 500 });
     }
 }

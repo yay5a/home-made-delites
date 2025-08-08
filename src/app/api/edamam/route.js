@@ -1,13 +1,12 @@
+import { LRUCache } from 'next/dist/server/lib/lru-cache';
 import { NextResponse } from 'next/server';
 
-const rateLimitStore = new Map();
 const WINDOW_SIZE = 60 * 1000;
 const MAX_REQUESTS = 10;
+const rateLimitStore = new LRUCache({ max: 5000, ttl: WINDOW_SIZE });
 
 function getClientKey(request) {
-    const xff = request.headers.get('x-forwarded-for');
-    if (xff) return xff.split(',')[0].trim();
-    return request.headers.get('host') || 'unknown';
+    return request.ip || 'unknown';
 }
 
 export async function GET(request) {
