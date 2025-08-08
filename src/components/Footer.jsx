@@ -48,11 +48,18 @@ export default function Footer() {
                     </ul>
                 </div>
 
-                {/* Legal copy pushed right on desktop */}
-                <div className="md:col-span-5 flex items-end md:justify-end">
+                {/* Legal copy and image pushed right on desktop */}
+                <div className="md:col-span-5 flex items-end md:justify-end gap-4">
                     <p className="text-sm" aria-label="Copyright">
                         &copy; {new Date().getFullYear()} Home Made Delites Developed by Yaysa. All rights reserved.
                     </p>
+                    <Link href="/">
+                        <img
+                            src="/images/logo-v8.jpg"
+                            alt="Home Made Delites Logo"
+                            className="w-16 h-16 object-cover"
+                        />
+                    </Link>
                 </div>
             </div>
         </footer>
