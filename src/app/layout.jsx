@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 export const metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
 						className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16"
 					>
 						{children}
+						<SpeedInsights />
 						<Analytics />
 					</main>
 					<Footer />
