@@ -6,8 +6,35 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 export const metadata = {
-	title: "Home Made Delites",
-	description: "Search for recipes to inspire your next home made delights!",
+	metadataBase: new URL(
+		process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+	),
+	title: "Home Made Delites — Discover Your Next Homemade Recipe",
+	description:
+		"Search cozy, home-style recipes. Save favorites and get smart suggestions on your dashboard.",
+	openGraph: {
+		title: "Home Made Delites",
+		description:
+			"Search cozy, home-style recipes. Save favorites and get smart suggestions.",
+		url: "/",
+		siteName: "Home Made Delites",
+		images: [
+			{
+				url: "/og-default.jpg",
+				width: 1200,
+				height: 630,
+				alt: "Home Made Delites",
+			},
+		],
+		type: "website",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Home Made Delites",
+		description: "Search cozy, home-style recipes.",
+		images: ["/og-default.jpg"],
+	},
+	robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }) {

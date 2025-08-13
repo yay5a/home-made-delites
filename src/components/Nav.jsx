@@ -1,96 +1,77 @@
-'use client';
-
-import React, { useState, useContext } from 'react';
-import Link from 'next/link';
-import { AuthContext } from '@/context/AuthContext';
+"use client";
+import React, { useContext, useState } from "react";
+import { AuthContext } from "@/context/AuthContext";
+import Link from "next/link";
 
 export default function Nav() {
-    const [openMenu, setOpenMenu] = useState(false);
-    const { isAuthenticated, logout } = useContext(AuthContext);
+	const { isAuthenticated, logout } = useContext(AuthContext);
+	const [open, setOpen] = useState(false);
 
-    const navItems = [
-        { href: '/', label: 'Home' },
-        ...(!isAuthenticated ? [
-            { href: '/login', label: 'Login' },
-            { href: '/register', label: 'Register' }
-        ] : [])
-    ];
+	const common = [
+		{ href: "/", label: "Home" },
+		{ href: "/recipes", label: "Recipes" },
+	];
+	const guest = [
+		{ href: "/login", label: "Login" },
+		{ href: "/register", label: "Register" },
+	];
+	const authed = [{ href: "/dashboard", label: "Dashboard" }];
 
-    return (
-        <nav className="relative top-0 w-full z-50">
-            {/* Desktop Nav */}
-
-            <ul className="hidden md:flex space-x-8">
-                {navItems.map(({ href, label }) => (
-                    <li key={href}>
-                        <Link href={href} className="text-amber-800 hover:text-amber-600">
-                            {label}
-                        </Link>
-                    </li>
-                ))}
-                {isAuthenticated && (
-                    <li>
-                        <button onClick={logout} className="text-amber-800 hover:text-amber-600">
-                            Logout
-                        </button>
-                    </li>
-                )}
-            </ul>
-            {/* Mobile Menu Toggle */}
-            <button
-                onClick={() => setOpenMenu(!openMenu)}
-                className="md:hidden p-2 rounded-md text-amber-800 hover:bg-amber-100 transition-colors"
-                aria-label="Toggle menu"
-            >
-                <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    {openMenu ? (
-                        <path d="M6 18L18 6M6 6l12 12" />
-                    ) : (
-                        <path d="M4 6h16M4 12h16M4 18h16" />
-                    )}
-                </svg>
-            </button>
-
-            {/* Mobile Nav */}
-            {openMenu && (
-                <ul
-                    id="mobile-menu"
-                    className="md:hidden mt-2 space-y-2 p-4 shadow-lg"
-                >
-                    {navItems.map(({ href, label }) => (
-                        <li key={href}>
-                            <Link
-                                href={href}
-                                className="block text-amber-800 hover:text-amber-600"
-                                onClick={() => setOpenMenu(false)}
-                            >
-                                {label}
-                            </Link>
-                        </li>
-                    ))}
-                    {isAuthenticated && (
-                        <li>
-                            <button
-                                onClick={() => {
-                                    logout();
-                                    setOpenMenu(false);
-                                }}
-                                className="block text-amber-800 hover:text-amber-600"
-                            >
-                                Logout
-                            </button>
-                        </li>
-                    )}
-                </ul>
-            )}
-        </nav>
-    );
+	return (
+		<nav className="w-full border-b bg-white">
+			<div className="container mx-auto px-4 py-3 flex items-center justify-between">
+				<Link href="/" className="font-bold text-amber-700">
+					Home Made Delites
+				</Link>
+				<button
+					className="md:hidden px-3 py-2 border rounded"
+					onClick={() => setOpen((v) => !v)}
+				>
+					Menu
+				</button>
+				<ul className="hidden md:flex items-center gap-5">
+					{[...common, ...(isAuthenticated ? authed : guest)].map((i) => (
+						<li key={i.href}>
+							<Link className="hover:text-amber-700" href={i.href}>
+								{i.label}
+							</Link>
+						</li>
+					))}
+					{isAuthenticated && (
+						<li>
+							<button
+								onClick={logout}
+								className="text-amber-700 hover:underline"
+							>
+								Logout
+							</button>
+						</li>
+					)}
+				</ul>
+			</div>
+			{open && (
+				<ul className="md:hidden border-t p-3 space-y-2">
+					{[...common, ...(isAuthenticated ? authed : guest)].map((i) => (
+						<li key={i.href}>
+							<Link href={i.href} onClick={() => setOpen(false)}>
+								{i.label}
+							</Link>
+						</li>
+					))}
+					{isAuthenticated && (
+						<li>
+							<button
+								onClick={() => {
+									logout();
+									setOpen(false);
+								}}
+							>
+								Logout
+							</button>
+						</li>
+					)}
+				</ul>
+			)}
+		</nav>
+	);
 }

@@ -1,83 +1,90 @@
-'use client'
+"use client";
 
-import { SiFacebook } from 'react-icons/si';
-import { SiInstagram } from 'react-icons/si';
-import { SiX } from 'react-icons/si';
-import Link from 'next/link';
+import { SiFacebook } from "react-icons/si";
+import { SiInstagram } from "react-icons/si";
+import { SiX } from "react-icons/si";
+import Link from "next/link";
 
 export default function Footer() {
-    return (
-        <footer className="bg-amber-50 text-stone-800 pt-10 pb-6 border-t-4 border-dotted border-amber-300">
-            <div className="container mx-auto grid gap-8 md:grid-cols-12">
-                {/* Brand + Social */}
-                <div className="md:col-span-4 space-y-4">
-                    <h3 className="text-lg font-semibold text-stone-900">Home Made Delites</h3>
-                    <p>
-                        Discover and share delicious homemade recipes with our community of food
-                        lovers.
-                    </p>
-                    <div className="flex space-x-4">
-                        <SocialIcon href="https://facebook.com" label="Facebook">
-                            <SiFacebook className="w-6 h-6" />
-                        </SocialIcon>
-                        <SocialIcon href="https://instagram.com" label="Instagram">
-                            <SiInstagram className="w-6 h-6" />
-                        </SocialIcon>
-                        <SocialIcon href="https://x.com" label="X / Twitter">
-                            <SiX className="w-6 h-6" />
-                        </SocialIcon>
-                    </div>
-                </div>
+	return (
+		<footer className="bg-amber-50 text-stone-800 pt-10 pb-6 border-t-4 border-dotted border-amber-300">
+			<div className="container mx-auto grid gap-8 md:grid-cols-12">
+				{/* Brand + Social */}
+				<div className="md:col-span-4 space-y-4">
+					<h3 className="text-lg font-semibold text-stone-900">
+						Home Made Delites
+					</h3>
+					<p>
+						Discover and share delicious homemade recipes with our community of
+						food lovers.
+					</p>
+					<div className="flex space-x-4">
+						<SocialIcon href="https://facebook.com" label="Facebook">
+							<SiFacebook className="w-6 h-6" />
+						</SocialIcon>
+						<SocialIcon href="https://instagram.com" label="Instagram">
+							<SiInstagram className="w-6 h-6" />
+						</SocialIcon>
+						<SocialIcon href="https://x.com" label="X / Twitter">
+							<SiX className="w-6 h-6" />
+						</SocialIcon>
+					</div>
+				</div>
 
-                {/* Support links */}
-                <div className="md:col-span-3">
-                    <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-900 mb-4">
-                        Support
-                    </h3>
-                    <ul className="space-y-2">
-                        {[
-                            { href: '#', text: 'Help Center' },
-                            { href: '#', text: 'Contact Us' },
-                            { href: '#', text: 'Privacy Policy' },
-                            { href: '#', text: 'Terms of Service' },
-                        ].map(({ href, text }) => (
-                            <li key={text}>
-                                <FooterLink href={href}>{text}</FooterLink>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+				{/* Support links */}
+				<div className="md:col-span-3">
+					<h3 className="text-sm font-semibold uppercase tracking-wider text-stone-900 mb-4">
+						Support
+					</h3>
+					<ul className="space-y-2">
+						{[
+							{ href: "#", text: "Help Center" },
+							{ href: "#", text: "Contact Us" },
+							{ href: "#", text: "Privacy Policy" },
+							{ href: "#", text: "Terms of Service" },
+						].map(({ href, text }) => (
+							<li key={text}>
+								<FooterLink href={href}>{text}</FooterLink>
+							</li>
+						))}
+					</ul>
+				</div>
 
-                {/* Legal copy and image pushed right on desktop */}
-                <div className="md:col-span-5 flex items-end md:justify-end gap-4">
-                    <p className="text-sm" aria-label="Copyright">
-                        &copy; {new Date().getFullYear()} Home Made Delites Developed by Yaysa. All rights reserved.
-                    </p>
-                    <Link href="/">
-                        <img
-                            src="/images/logo-v8.jpg"
-                            alt="Home Made Delites Logo"
-                            className="w-16 h-16 object-cover"
-                        />
-                    </Link>
-                </div>
-            </div>
-        </footer>
-    );
+				{/* Legal copy and image pushed right on desktop */}
+				<div className="md:col-span-5 flex items-end md:justify-end gap-4">
+					<p className="text-sm" aria-label="Copyright">
+						&copy; {new Date().getFullYear()} Home Made Delites Developed by
+						Yaysa. All rights reserved.
+					</p>
+					<Link href="/">
+						<img
+							src="/images/logo-v8.jpg"
+							alt="Home Made Delites Logo"
+							className="w-16 h-16 object-cover"
+						/>
+					</Link>
+				</div>
+			</div>
+		</footer>
+	);
 }
 
 function FooterLink({ href, children }) {
-    return (
-        <Link href={href} className="hover:text-stone-900 transition-colors">
-            {children}
-        </Link>
-    );
+	return (
+		<Link href={href} className="hover:text-stone-900 transition-colors">
+			{children}
+		</Link>
+	);
 }
 
 function SocialIcon({ href, label, children }) {
-    return (
-        <Link href={href} aria-label={label} className="hover:text-stone-900 transition-colors">
-            {children}
-        </Link>
-    );
+	return (
+		<Link
+			href={href}
+			aria-label={label}
+			className="hover:text-stone-900 transition-colors"
+		>
+			{children}
+		</Link>
+	);
 }
