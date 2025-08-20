@@ -10,7 +10,17 @@ const patrick = Patrick_Hand({ subsets: ["latin"], weight: "400" });
 
 export default function RecipeCard({ recipe }) {
 	if (!recipe) return null;
+
 	const { cuisineType = [], dietLabels = [], mealType = [] } = recipe;
+
+	const totalCal = Number(recipe.calories) || 0;
+	const servings = Number(recipe.yield) || 0;
+	const perServing = servings > 0 ? Math.round(totalCal / servings) : null;
+
+	const per100 =
+		!perServing && Number(recipe.totalWeight) > 0
+			? Math.round((totalCal / Number(recipe.totalWeight)) * 100)
+			: null;
 
 	const tags = [...cuisineType, ...dietLabels, ...mealType];
 	const shown = tags.slice(0, 3);
@@ -67,12 +77,24 @@ export default function RecipeCard({ recipe }) {
 					)}
 				</div>
 
-				{recipe.calories > 0 && (
-					<div className="flex items-center justify-center text-sm mt-2">
-						<FireIcon className="w-5 h-5 mr-1 text-amber-400" />
-						<span className="block text-xs text-gray-700">
-							{Math.round(recipe.calories)} Cal
-						</span>
+				{totalCal > 0 && (
+					<div className="flex flex-col items-center justify-center text-sm mt-2">
+						<div className="flex items-center">
+							<FireIcon className="w-5 h-5 mr-1 text-amber-400" />
+							<span className="block text-xs text-gray-700">
+								{perServing !== null
+									? `${perServing} Cal / serving`
+									: per100g !== null
+										? `${per100g} Cal / 100g`
+										: `${Math.round(totalCal)} Cal total`}
+							</span>
+						</div>
+						{servings > 0 && (
+							<span className="text-[10px] text-gray-500 mt-1">
+								~{Math.round(totalCal)} total * {servings} serving
+								{servings > 1 ? "s" : ""}
+							</span>
+						)}
 					</div>
 				)}
 			</article>
